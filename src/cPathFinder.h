@@ -67,11 +67,13 @@ public:
     // Human readable path list
     std::string pathText();
 
-private:
+protected:
     graph_t             myGraph;        // graph
     int                 myStart;        // starting node index
     int                 myEnd;          // ending node index
     std::vector<int>    myPath;         // vector of node indices visited
+    std::vector<int>    myDist;         // cost to reach each node from start
+    std::vector<int>    myPred;         // previous node to each node from start
 
     /** Parse Space Delimited line
  * @param[in] l line from a space delimited text file
@@ -79,4 +81,11 @@ private:
  */
     std::vector<std::string> ParseSpaceDelimited(
         const std::string &l);
+
+    int findoradd(const std::string &name);
+    int find(const std::string &name);
+
+    /// pick out path, starting at goal and finishing at start
+    void pathPick();
+
 };

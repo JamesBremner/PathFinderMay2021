@@ -18,6 +18,19 @@
 				"isDefault": true
 			},
 		},
-		
+		{
+			"label": "make turns",
+			"command": "mingw32-make.exe",
+			"args": [
+				"turns"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},	
 	]
 }

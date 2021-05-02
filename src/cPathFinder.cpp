@@ -46,24 +46,27 @@ void cPathFinder::read(
 void cPathFinder::path()
 {
     // run dijkstra algorithm
-    std::vector<int> p(num_vertices(myGraph));
-    std::vector<int> vDist(num_vertices(myGraph));
+    myPred.resize( num_vertices(myGraph) );
+    myDist.resize( num_vertices(myGraph) );
     boost::dijkstra_shortest_paths(
         myGraph,
         myStart,
         weight_map(get(&cEdge::myCost, myGraph))
             .predecessor_map(boost::make_iterator_property_map(
-                p.begin(), get(boost::vertex_index, myGraph)))
+                myPred.begin(), get(boost::vertex_index, myGraph)))
             .distance_map(boost::make_iterator_property_map(
-                vDist.begin(), get(boost::vertex_index, myGraph))));
+                myDist.begin(), get(boost::vertex_index, myGraph))));
 
+}
+
+void cPathFinder::pathPick() {
     // pick out path, starting at goal and finishing at start
     myPath.push_back(myEnd);
     int prev = myEnd;
     while (1)
     {
-        //std::cout << prev << " " << p[prev] << ", ";
-        int next = p[prev];
+        //std::cout << prev << " " << myPred[prev] << ", ";
+        int next = myPred[prev];
         myPath.push_back(next);
         if (next == myStart)
             break;
@@ -104,6 +107,26 @@ std::vector<std::string> cPathFinder::ParseSpaceDelimited(
     return token;
 }
 
+int cPathFinder::findoradd(const std::string &name)
+{
+    int n = find(name);
+    if (n < 0)
+        n = add_vertex(name, myGraph);
+    return n;
+}
+
+int cPathFinder::find(const std::string &name)
+{
+    for (int n = 0; n < num_vertices(myGraph); n++)
+    {
+        if (myGraph[n].myName == name)
+        {
+            return n;
+        }
+    }
+    return -1;
+}
+
 std::string cPathFinder::linksText()
 {
     std::stringstream ss;
@@ -135,6 +158,7 @@ std::string cPathFinder::pathText()
             sn = std::to_string( n );
         ss << sn << " -> ";
     }
+    std::cout << "\n";
     ss << "\n";
     return ss.str();
 }
