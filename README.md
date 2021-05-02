@@ -1,5 +1,5 @@
 # PathFinder Engine
-Discover optimum path through graphs of costed links.  
+Discover optimum path through a graph of costed links.  
 
 # Costs
 A straightforward application that inputs links, link costs, starting and ending nodes, then uses the PathFinder engine to find optimal path.
