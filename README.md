@@ -1,5 +1,5 @@
 # PathFinder Engine
-Discover optimum path through a graph of costed links.  
+Discover optimum path through a graph of costed links.  The engine can be used directly to find minimum cost path through the graph, or specialized to model particular problems that need to find paths.  The following lists available applications that model certain problems.
 
 # Costs
 An application that inputs links, link costs, starting and ending nodes, then uses the PathFinder engine to find optimal path.
