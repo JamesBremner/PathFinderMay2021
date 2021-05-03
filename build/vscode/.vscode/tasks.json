@@ -47,6 +47,34 @@
 			"group": "build"
 		},	
 		{
+			"label": "make farms",
+			"command": "mingw32-make.exe",
+			"args": [
+				"farms"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},	
+		{
+			"label": "make mazes",
+			"command": "mingw32-make.exe",
+			"args": [
+				"mazes"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},	
+		{
 			"label": "clean",
 			"command": "mingw32-make.exe",
 			"args": [

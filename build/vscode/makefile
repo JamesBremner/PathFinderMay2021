@@ -20,6 +20,13 @@ TURNS = $(patsubst %,$(ODIR)/%,$(_TURNS))
 _HILLS = hills.o cPathFinder.o cHillPathFinder.o
 HILLS = $(patsubst %,$(ODIR)/%,$(_HILLS))
 
+_FARMS = farms.o cPathFinder.o cFarmPathFinder.o \
+	geo.o geoPolygon.o
+FARMS = $(patsubst %,$(ODIR)/%,$(_FARMS))
+
+_MAZES = mazes.o cPathFinder.o cMazePathFinder.o 
+MAZES = $(patsubst %,$(ODIR)/%,$(_MAZES))
+
 $(ODIR)/%.o: %.cpp $(DEPS)
 	g++   -std=c++17 -c -o $@ $< $(INCS)
 
@@ -31,6 +38,12 @@ turns: $(TURNS)
 
 hills: $(HILLS)
 	g++ -o ../../bin/hills.exe $^ 
+
+farms: $(FARMS)
+	g++ -o ../../bin/farms.exe $^ 
+
+mazes: $(MAZES)
+	g++ -o ../../bin/mazes.exe $^ 
 
 .PHONY: clean
 
