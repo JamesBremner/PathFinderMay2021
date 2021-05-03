@@ -17,6 +17,9 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 _TURNS = turn.o cPathFinder.o cTurnPathFinder.o
 TURNS = $(patsubst %,$(ODIR)/%,$(_TURNS))
 
+_HILLS = hills.o cPathFinder.o cHillPathFinder.o
+HILLS = $(patsubst %,$(ODIR)/%,$(_HILLS))
+
 $(ODIR)/%.o: %.cpp $(DEPS)
 	g++   -std=c++17 -c -o $@ $< $(INCS)
 
@@ -25,6 +28,9 @@ costs: $(OBJ)
 
 turns: $(TURNS)
 	g++ -o ../../bin/turns.exe $^ 	
+
+hills: $(HILLS)
+	g++ -o ../../bin/hills.exe $^ 
 
 .PHONY: clean
 

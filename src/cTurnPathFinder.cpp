@@ -155,7 +155,7 @@ void cTurnPathFinder::tpath()
     if (myStart < 0)
         throw std::runtime_error("Bad path start");
 
-    cPathFinder::path();
+    cPathFinder::paths( myStart );
 
     std::string sgf = std::to_string(myEnd) + "f";
     std::string sgb = std::to_string(myEnd) + "b";
@@ -176,7 +176,7 @@ void cTurnPathFinder::tpath()
             myEnd = goalb;
     }
 
-    pathPick();
+    pathPick( myEnd );
 
 
 }

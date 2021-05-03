@@ -41,11 +41,26 @@ typedef boost::adjacency_list<
 class cPathFinder
 {
 public:
-    // read input file
+
+/// read input file
     void read(
         const std::string &fname);
 
+/** Find path from start to end node
+ * 
+ * The path from attributes myStart to myEnd is
+ * is saved into myPath
+ * The path can be listed by call to pathText();
+ */
     void path();
+
+/** Find paths from start to all nodes
+ */
+    void paths( int start );
+
+/** Find path to end node, afters call to paths( int start )
+ */
+    void pathPick( int end );
 
 /** Add costed link between two nodes
  * 
@@ -85,7 +100,5 @@ protected:
     int findoradd(const std::string &name);
     int find(const std::string &name);
 
-    /// pick out path, starting at goal and finishing at start
-    void pathPick();
 
 };

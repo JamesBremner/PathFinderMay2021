@@ -32,5 +32,33 @@
 			],
 			"group": "build"
 		},	
+		{
+			"label": "make hills",
+			"command": "mingw32-make.exe",
+			"args": [
+				"hills"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},	
+		{
+			"label": "clean",
+			"command": "mingw32-make.exe",
+			"args": [
+				"clean"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},	
 	]
 }
