@@ -9,3 +9,6 @@ An application that models a robot that can travel either "forwards" or "backwar
 
 # Hills
 An application that finds a path through a grid of points with different elevations that minimises the changes in elevation. Uses the PathFinder engine find the optimal path. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Hills)
+
+# Mazes
+An application that finds a path through a maze.
