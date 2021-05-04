@@ -1,5 +1,6 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include "cPathFinder.h"
+using namespace boost;
 
 void cPathFinder::read(
     const std::string &fname)

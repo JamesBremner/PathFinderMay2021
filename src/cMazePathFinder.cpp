@@ -1,5 +1,5 @@
 #include "cMazePathFinder.h"
-
+using namespace boost;
 void cMazePathFinder::read(
     const std::string &fname)
 {
