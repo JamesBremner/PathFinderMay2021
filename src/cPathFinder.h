@@ -2,11 +2,47 @@
 #include <fstream>
 #include <boost/graph/adjacency_list.hpp>
 
-/// general purpose path finder
+/** general purpose path finder
+ * 
+ **** Usage: Node indices
+ * 
+ * Use addLink( int u, int v, float cost )
+ * to add a costed link between nodes referred by their index
+ * 
+ * Use start() and end()
+ * to specify starting and ending node indices
+ * 
+ * Use path() 
+ * to calculate optimim path from start to end
+ * 
+ * Use pathText()
+ * to get a string listing the node indices visited
+ * 
+ **** Usage: Node names
+ *
+ * To refer to nodes by name,
+ * rather than keeping track of their indices,
+ * use findoradd( std:;string& name )
+ * PathText() will return a list of nodes visited by their name
+ * 
+ * <pre>
+ 
+   cPathFinder f;
+   f.addLink(
+       f.findoradd("A"),
+       f.findoradd("B"),
+       cost );
+    ...
+    f.start(f.find("A"));
+    f.end(f.find("B"));
+    f.path();
+    std::cout << f.pathText() << "\n";
+  </pre>
+ * 
+ */
 class cPathFinder
 {
 public:
-
     /** read input file
  *
  * @param[in] fname path to input file.
@@ -38,6 +74,15 @@ public:
         int v,
         float cost);
 
+    void start(int start)
+    {
+        myStart = start;
+    }
+    void end(int end)
+    {
+        myEnd = end;
+    }
+
     /** Find optimum path from start to end node
  *
  * The path from attributes myStart to myEnd is
@@ -59,6 +104,22 @@ public:
 
     /// Human readable path list
     std::string pathText();
+
+    /** Find or add node by name
+ * 
+ * @param[in] name
+ * @return node index
+ * 
+ * If a node of specified nane does not exist, it is added.
+ */
+    int findoradd(const std::string &name);
+
+    /** Find or add node by name
+ * 
+ * @param[in] name
+ * @return node index, -1 if named node does not exist
+ */
+    int find(const std::string &name);
 
 protected:
     /// edge properties
@@ -108,7 +169,4 @@ protected:
  */
     std::vector<std::string> ParseSpaceDelimited(
         const std::string &l);
-
-    int findoradd(const std::string &name);
-    int find(const std::string &name);
 };
