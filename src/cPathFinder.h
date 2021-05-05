@@ -54,6 +54,7 @@ public:
  * File format is specified at https://github.com/JamesBremner/PathFinder/wiki/Costs
  *
  * Specializations with their own file formats should override this method
+ * and can use the protected function ParseSpaceDelimited() to assist parsing.
  *
  */
     void read(
@@ -67,7 +68,7 @@ public:
  *
  * If the nodes do not exist, they will be added.
  *
- * Two directed links are added u > v and V > u
+ * Two directed links are added u > v and v > u
  */
     void addLink(
         int u,

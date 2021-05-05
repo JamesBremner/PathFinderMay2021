@@ -1,5 +1,7 @@
+#include <algorithm>
 #include "cMazePathFinder.h"
 using namespace boost;
+
 void cMazePathFinder::read(
     const std::string &fname)
 {
@@ -30,14 +32,16 @@ void cMazePathFinder::read(
             readnumeric(line);
             continue;
         }
-        std::cout << "ascii\n";
 
         if (!even)
         {
             if (!myColCount)
                 myColCount = line.length() / 4;
             else if (line.length() / 4 != myColCount)
+            {
+                std::cout << line.length() << "\n";
                 throw std::runtime_error("Bad column count");
+            }
             for (int col = 0; col < myColCount; col++)
             {
                 if (line[col * 4] == ' ')
@@ -68,7 +72,10 @@ void cMazePathFinder::read(
                 if (!myColCount)
                     myColCount = line.length() / 4;
                 else if (line.length() / 4 != myColCount)
-                    std::runtime_error("Bad column count");
+                {
+                    std::cout << line.length() << "\n";
+                    throw std::runtime_error("Bad column count");
+                }
                 for (int col = 0; col < myColCount; col++)
                 {
                     if (line[col * 4 + 1] == ' ')
@@ -169,4 +176,109 @@ void cMazePathFinder::grid2graph()
             }
         }
     }
+}
+
+std::vector<int> cMazePathFinder::NodesConnected(int v)
+{
+    std::vector<int> vc;
+    typedef std::pair<graph_traits<graph_t>::out_edge_iterator, graph_traits<graph_t>::out_edge_iterator> out_edge_iter_pair_t;
+    for (out_edge_iter_pair_t ep = out_edges(v, myGraph);
+         ep.first != ep.second; ++(ep.first))
+    {
+        vc.push_back(target(*ep.first, myGraph));
+    }
+    return vc;
+}
+
+std::string cMazePathFinder::asciiArtText()
+{
+    //std::cout << myRowCount << " rows " << myColCount << " cols\n";
+
+    // construct blank charcter grid
+    std::vector<char> r(myColCount * 4 + 1, ' ');
+    std::vector<std::vector<char>> grid(2 * myRowCount + 1, r);
+
+    int row, col;
+
+    // wall along on bottom
+    for (col = 0; col < 4 * myColCount + 1; col += 4)
+    {
+        grid[2 * myRowCount][col] = '+';
+        grid[2 * myRowCount][col + 1] = '-';
+        grid[2 * myRowCount][col + 2] = '-';
+        grid[2 * myRowCount][col + 3] = '-';
+    }
+    for (row = 0; row < 2 * myRowCount; row += 2)
+    {
+        // wall on right
+        grid[row + 1][4 * myColCount] = '|';
+
+        // loop over cells
+        for (col = 0; col < 4 * myColCount; col += 4)
+        {
+            // top left cell corner
+            grid[row][col] = '+';
+
+            // cell index in graph
+            int n = (row / 2) * myColCount + (col / 4);
+
+            // connected cells
+            auto vc = NodesConnected(n);
+
+            // cell in path
+            if (std::find(
+                    myPath.begin(),
+                    myPath.end(),
+                    n) != myPath.end())
+                grid[row + 1][col + 2] = '*';
+
+            // connected to previous cell in row
+            bool open = false;
+            for (int c : vc)
+            {
+                if (c == n - 1)
+                    open = true;
+            }
+            if (!open)
+                grid[row + 1][col] = '|';
+
+            // connected to cell abone
+            open = false;
+            for (int c : vc)
+            {
+                if (c == n - myColCount)
+                    open = true;
+            }
+            if (!open)
+            {
+                grid[row][col + 1] = '-';
+                grid[row][col + 2] = '-';
+                grid[row][col + 3] = '-';
+            }
+
+            // start cell
+            if (n == myStart)
+                grid[row + 1][col+2] = 's';
+            
+            // end cell
+            if (n == myEnd)
+                grid[row + 1][col + 2] = 'e';
+
+        }
+
+        // top left corner of last cell in row
+        grid[row][col] = '+';
+    }
+
+    std::stringstream ss;
+    for (int row = 0; row < 2 * myRowCount + 1; row++)
+    {
+        for (int col = 0; col < 4 * myColCount + 1; col++)
+        {
+            ss << grid[row][col];
+        }
+        ss << "\n";
+    }
+
+    return ss.str();
 }

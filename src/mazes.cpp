@@ -18,11 +18,14 @@ main(int argc, char *argv[])
 // read input
     finder.read( argv[1] );
 
-    std::cout << finder.linksText() << "\n";
+    //std::cout << finder.linksText() << "\n";
 
 // find path
     finder.path();
 
 // display
     std::cout << finder.pathText();
+
+    std::cout << finder.asciiArtText();
+
 }
