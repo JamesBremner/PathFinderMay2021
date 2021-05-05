@@ -16,3 +16,6 @@ An application that finds a path through a grid of points with different elevati
 
 ## Mazes
 An application that finds a path through a maze.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Mazes)
+
+## Spans
+An application that finds minimum cost links that connect all nodes.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Spans)
