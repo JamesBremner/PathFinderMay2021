@@ -27,6 +27,9 @@ FARMS = $(patsubst %,$(ODIR)/%,$(_FARMS))
 _MAZES = mazes.o cPathFinder.o cMazePathFinder.o 
 MAZES = $(patsubst %,$(ODIR)/%,$(_MAZES))
 
+_SPANS = spans.o cPathFinder.o cMazePathFinder.o 
+SPANS = $(patsubst %,$(ODIR)/%,$(_SPANS))
+
 $(ODIR)/%.o: %.cpp $(DEPS)
 	g++   -std=c++17 -c -o $@ $< $(INCS)
 
@@ -44,6 +47,9 @@ farms: $(FARMS)
 
 mazes: $(MAZES)
 	g++ -o ../../bin/mazes.exe $^ 
+
+spans: $(SPANS)
+	g++ -o ../../bin/spans.exe $^ 
 
 .PHONY: clean
 

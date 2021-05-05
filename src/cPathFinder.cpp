@@ -1,4 +1,5 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include "cPathFinder.h"
 using namespace boost;
 
@@ -44,14 +45,14 @@ void cPathFinder::read(
     }
 }
 
-void cPathFinder::paths( int start )
+void cPathFinder::paths(int start)
 {
-    // std::cout << "->cPathFinder::path " << num_vertices(myGraph) 
+    // std::cout << "->cPathFinder::path " << num_vertices(myGraph)
     //     <<" " << myStart << "\n";
     // run dijkstra algorithm
-    myPred.resize( num_vertices(myGraph) );
-    myDist.resize( num_vertices(myGraph) );
-    boost::dijkstra_shortest_paths(
+    myPred.resize(num_vertices(myGraph));
+    myDist.resize(num_vertices(myGraph));
+    dijkstra_shortest_paths(
         myGraph,
         start,
         weight_map(get(&cEdge::myCost, myGraph))
@@ -64,15 +65,35 @@ void cPathFinder::paths( int start )
 
 void cPathFinder::path()
 {
-    paths( myStart );
-    pathPick( myEnd );
+    paths(myStart);
+    pathPick(myEnd);
 }
 
-void cPathFinder::pathPick( int end ) {
+void cPathFinder::span()
+{
+    typedef graph_traits<graph_t>::edge_descriptor edge_t;
+    std::vector<edge_t> spanning_tree;
+    kruskal_minimum_spanning_tree(
+        myGraph,
+        std::back_inserter(spanning_tree),
+        weight_map(get(&cEdge::myCost, myGraph)));
+
+    mySpan.clear();
+    for (auto e : spanning_tree)
+    {
+        std::vector<int> ve{
+            (int)source(e, myGraph),
+            (int)target(e, myGraph)};
+        mySpan.push_back(ve);
+    }
+}
+
+void cPathFinder::pathPick(int end)
+{
     // std::cout << "->cPathFinder::pathPick "
     //     << myStart <<" " << myEnd << "\n";
     // pick out path, starting at goal and finishing at start
-    myPath.push_back( end );
+    myPath.push_back(end);
     int prev = end;
     while (1)
     {
@@ -164,13 +185,34 @@ std::string cPathFinder::linksText()
 std::string cPathFinder::pathText()
 {
     std::stringstream ss;
-    for (auto n : myPath) {
+    for (auto n : myPath)
+    {
         std::string sn = myGraph[n].myName;
-        if( sn == "???")
-            sn = std::to_string( n );
+        if (sn == "???")
+            sn = std::to_string(n);
         ss << sn << " -> ";
     }
     std::cout << "\n";
+    ss << "\n";
+    return ss.str();
+}
+
+std::string cPathFinder::spanText()
+{
+    std::stringstream ss;
+    for (auto e : mySpan)
+    {
+        std::string sn = myGraph[e[0]].myName;
+        if (sn == "???")
+            sn = std::to_string(e[0]);
+
+        ss << sn << " - ";
+        sn = myGraph[e[1]].myName;
+        if (sn == "???")
+            sn = std::to_string(e[1]);
+
+        ss << sn << ", ";
+    }
     ss << "\n";
     return ss.str();
 }

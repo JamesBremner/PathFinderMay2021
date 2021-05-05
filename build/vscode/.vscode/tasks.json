@@ -75,6 +75,20 @@
 			"group": "build"
 		},	
 		{
+			"label": "make spans",
+			"command": "mingw32-make.exe",
+			"args": [
+				"spans"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},	
+		{
 			"label": "clean",
 			"command": "mingw32-make.exe",
 			"args": [

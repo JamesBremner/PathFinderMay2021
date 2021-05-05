@@ -74,10 +74,13 @@ public:
         int v,
         float cost);
 
+/// set staring node
     void start(int start)
     {
         myStart = start;
     }
+
+/// set ending node
     void end(int end)
     {
         myEnd = end;
@@ -99,11 +102,18 @@ public:
  */
     void pathPick(int end);
 
+    /** Find minimum edge set that connects all nodes together
+ */
+    void span();
+
     /// Human readable list of links
     std::string linksText();
 
     /// Human readable path list
     std::string pathText();
+
+    /// Human readable list of edges that connects all nodes together
+    std::string spanText();
 
     /** Find or add node by name
  * 
@@ -156,12 +166,13 @@ protected:
         cEdge>
         graph_t;
 
-    graph_t myGraph;         // graph
-    int myStart;             // starting node index
-    int myEnd;               // ending node index
-    std::vector<int> myPath; // vector of node indices visited
-    std::vector<int> myDist; // cost to reach each node from start
-    std::vector<int> myPred; // previous node to each node from start
+    graph_t myGraph;                      // graph
+    int myStart;                          // starting node index
+    int myEnd;                            // ending node index
+    std::vector<int> myPath;              // vector of node indices visited
+    std::vector<int> myDist;              // cost to reach each node from start
+    std::vector<int> myPred;              // previous node to each node from start
+    std::vector<std::vector<int>> mySpan; // edges in minimum spanning tree
 
     /** Parse Space Delimited line
  * @param[in] l line from a space delimited text file
