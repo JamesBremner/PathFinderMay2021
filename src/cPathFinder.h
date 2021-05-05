@@ -115,6 +115,15 @@ public:
     /// Human readable list of edges that connects all nodes together
     std::string spanText();
 
+    /** graphical display of graph with path in red
+     * 
+     * @return display in graphviz dot format
+     * 
+     * render at https://dreampuf.github.io/GraphvizOnline
+     * 
+     */
+    std::string pathViz();
+
     /** Find or add node by name
  * 
  * @param[in] name

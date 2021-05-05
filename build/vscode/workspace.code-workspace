@@ -73,7 +73,8 @@
 			"cfenv": "cpp",
 			"cinttypes": "cpp",
 			"variant": "cpp",
-			"strstream": "cpp"
+			"strstream": "cpp",
+			"*.ipp": "cpp"
 		}
 	}
 }

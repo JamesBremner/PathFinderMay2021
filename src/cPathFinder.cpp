@@ -216,3 +216,32 @@ std::string cPathFinder::spanText()
     ss << "\n";
     return ss.str();
 }
+
+std::string cPathFinder::pathViz()
+{
+    std::stringstream f;
+    f << "graph G {\n";
+    for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v)
+        f << std::to_string(v) << ";\n";
+
+    graph_traits<graph_t>::edge_iterator ei, ei_end;
+    for (tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
+    {
+        int src = source(*ei, myGraph);
+        int dst = target(*ei, myGraph);
+        f << std::to_string(src) << "--"
+          << std::to_string(dst) << " ";
+        auto pathItsrc = std::find(myPath.begin(), myPath.end(), src);
+        auto pathItdst = std::find(myPath.begin(), myPath.end(), dst);
+        if (  pathItsrc != myPath.end() && pathItdst != myPath.end() )
+        {
+            if (pathItsrc == pathItdst + 1 || pathItsrc == pathItdst - 1)
+            {
+                f << "[color=\"red\"] ";
+            }
+        }
+        f << ";\n";
+    }
+    f << "}\n";
+    return f.str();
+}

@@ -24,5 +24,8 @@ main(int argc, char *argv[])
     finder.path();
     
     std::cout << finder.pathText();
+
+    std::ofstream f("g.dot");
+    f << finder.pathViz();
     
 }
