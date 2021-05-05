@@ -94,7 +94,6 @@ void cPathFinder::addLink(
     float cost)
 {
     myGraph[add_edge(u, v, myGraph).first].myCost = cost;
-    myGraph[add_edge(v, u, myGraph).first].myCost = cost;
 }
 
 std::vector<std::string> cPathFinder::ParseSpaceDelimited(

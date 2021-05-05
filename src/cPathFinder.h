@@ -60,7 +60,7 @@ public:
     void read(
         const std::string &fname);
 
-    /** Add costed link between two nodes
+    /** Add costed undirected link between two nodes
  *
  * @param[in] u node index
  * @param[in] v node index
@@ -68,7 +68,6 @@ public:
  *
  * If the nodes do not exist, they will be added.
  *
- * Two directed links are added u > v and v > u
  */
     void addLink(
         int u,
@@ -152,7 +151,7 @@ protected:
     typedef boost::adjacency_list<
         boost::listS,
         boost::vecS,
-        boost::directedS,
+        boost::undirectedS,
         cNode,
         cEdge>
         graph_t;
