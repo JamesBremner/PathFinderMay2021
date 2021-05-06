@@ -124,6 +124,14 @@ public:
      */
     std::string pathViz();
 
+    /** graphical display of graph with spanning tree
+     * 
+     * @param[in] all true to see all links, spanning tree in red
+     * @param[in] all false to see spanning tree
+     * @return display in graphviz dot format
+     */
+    std::string spanViz( bool all = true );
+
     /** Find or add node by name
  * 
  * @param[in] name
@@ -182,6 +190,7 @@ protected:
     std::vector<int> myDist;              // cost to reach each node from start
     std::vector<int> myPred;              // previous node to each node from start
     std::vector<std::vector<int>> mySpan; // edges in minimum spanning tree
+    int mySpanCost;                       // total cost of links in spanning tree
 
     /** Parse Space Delimited line
  * @param[in] l line from a space delimited text file
@@ -189,4 +198,6 @@ protected:
  */
     std::vector<std::string> ParseSpaceDelimited(
         const std::string &l);
+
+    std::string namestring( int n );
 };

@@ -78,9 +78,12 @@ void cPathFinder::span()
         std::back_inserter(spanning_tree),
         weight_map(get(&cEdge::myCost, myGraph)));
 
+    std::cout << "spanning_tree " << spanning_tree.size() << "\n";
+    mySpanCost = 0;
     mySpan.clear();
     for (auto e : spanning_tree)
     {
+        mySpanCost += myGraph[e].myCost;
         std::vector<int> ve{
             (int)source(e, myGraph),
             (int)target(e, myGraph)};
@@ -182,6 +185,14 @@ std::string cPathFinder::linksText()
     return ss.str();
 }
 
+std::string cPathFinder::namestring( int n )
+{
+        std::string sn = myGraph[n].myName;
+        if (sn == "???")
+            sn = std::to_string(n);  
+        return sn;  
+}
+
 std::string cPathFinder::pathText()
 {
     std::stringstream ss;
@@ -199,19 +210,16 @@ std::string cPathFinder::pathText()
 
 std::string cPathFinder::spanText()
 {
+    std::cout << "spanText " << mySpan.size() 
+        << " cost "<< mySpanCost << "\n";
+
     std::stringstream ss;
     for (auto e : mySpan)
     {
-        std::string sn = myGraph[e[0]].myName;
-        if (sn == "???")
-            sn = std::to_string(e[0]);
-
-        ss << sn << " - ";
-        sn = myGraph[e[1]].myName;
-        if (sn == "???")
-            sn = std::to_string(e[1]);
-
-        ss << sn << ", ";
+        ss << namestring( e[0] )
+            << " - "
+            << namestring( e[1] )
+            << ", ";
     }
     ss << "\n";
     return ss.str();
@@ -233,7 +241,7 @@ std::string cPathFinder::pathViz()
           << std::to_string(dst) << " ";
         auto pathItsrc = std::find(myPath.begin(), myPath.end(), src);
         auto pathItdst = std::find(myPath.begin(), myPath.end(), dst);
-        if (  pathItsrc != myPath.end() && pathItdst != myPath.end() )
+        if (pathItsrc != myPath.end() && pathItdst != myPath.end())
         {
             if (pathItsrc == pathItdst + 1 || pathItsrc == pathItdst - 1)
             {
@@ -241,6 +249,56 @@ std::string cPathFinder::pathViz()
             }
         }
         f << ";\n";
+    }
+    f << "}\n";
+    return f.str();
+}
+
+std::string cPathFinder::spanViz(bool all)
+{
+    std::stringstream f;
+    f << "graph G {\n";
+    for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v) {
+        auto sn = myGraph[v].myName;
+        int x = atoi( sn.substr(1).c_str() );
+        int y = atoi( sn.substr( sn.find("x")+1).c_str());
+        f << sn 
+            << " [pos=\"" 
+            << std::to_string(x)
+            <<","
+            << std::to_string(y)
+            << "\"];\n";
+    }
+
+    graph_traits<graph_t>::edge_iterator ei, ei_end;
+    for (tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
+    {
+        auto src = myGraph[source(*ei, myGraph)].myName;
+        auto dst = myGraph[target(*ei, myGraph)].myName;
+        bool span = false;
+        for (auto &se : mySpan)
+        {
+            if (src == myGraph[se[0]].myName && dst == myGraph[se[1]].myName ||
+                src == myGraph[se[1]].myName && dst == myGraph[se[0]].myName)
+            {
+                span = true;
+                break;
+            }
+        }
+        if (all)
+        {
+            f << src << "--"
+              << dst << " ";
+            if (span)
+                f << "[color=\"red\"]";
+            f << ";\n";
+        }
+        else if (span)
+        {
+            f << src << "--"
+              << dst
+              << " [color=\"red\"];\n";
+        }
     }
     f << "}\n";
     return f.str();
