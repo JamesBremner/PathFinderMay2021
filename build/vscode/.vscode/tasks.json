@@ -89,6 +89,20 @@
 			"group": "build"
 		},	
 		{
+			"label": "make sales",
+			"command": "mingw32-make.exe",
+			"args": [
+				"sales"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},	
+		{
 			"label": "clean",
 			"command": "mingw32-make.exe",
 			"args": [

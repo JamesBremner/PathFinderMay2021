@@ -30,6 +30,9 @@ MAZES = $(patsubst %,$(ODIR)/%,$(_MAZES))
 _SPANS = spans.o cPathFinder.o cMazePathFinder.o 
 SPANS = $(patsubst %,$(ODIR)/%,$(_SPANS))
 
+_SALES = sales.o cPathFinder.o cMazePathFinder.o 
+SALES = $(patsubst %,$(ODIR)/%,$(_SALES))
+
 $(ODIR)/%.o: %.cpp $(DEPS)
 	g++   -std=c++17 -c -o $@ $< $(INCS)
 
@@ -50,6 +53,9 @@ mazes: $(MAZES)
 
 spans: $(SPANS)
 	g++ -o ../../bin/spans.exe $^ 
+
+sales: $(SALES)
+	g++ -o ../../bin/sales.exe $^ 
 
 .PHONY: clean
 

@@ -106,6 +106,8 @@ public:
  */
     void span();
 
+    void tsp();
+
     /// Human readable list of links
     std::string linksText();
 
@@ -147,6 +149,13 @@ public:
  * @return node index, -1 if named node does not exist
  */
     int find(const std::string &name);
+
+    /** Parse Space Delimited line
+ * @param[in] l line from a space delimited text file
+ * @return vector of strings containing the columns extracted from line
+ */
+    std::vector<std::string> ParseSpaceDelimited(
+        const std::string &l);
 
 protected:
     /// edge properties
@@ -191,13 +200,6 @@ protected:
     std::vector<int> myPred;              // previous node to each node from start
     std::vector<std::vector<int>> mySpan; // edges in minimum spanning tree
     int mySpanCost;                       // total cost of links in spanning tree
-
-    /** Parse Space Delimited line
- * @param[in] l line from a space delimited text file
- * @return vector of strings containing the columns extracted from line
- */
-    std::vector<std::string> ParseSpaceDelimited(
-        const std::string &l);
 
     std::string namestring( int n );
 };

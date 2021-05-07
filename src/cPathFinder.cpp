@@ -1,5 +1,6 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
+#include <boost/graph/metric_tsp_approx.hpp>
 #include "cPathFinder.h"
 using namespace boost;
 
@@ -91,8 +92,40 @@ void cPathFinder::span()
     }
 }
 
+
+void cPathFinder::tsp()
+{
+    std::vector<int> c;
+    double len = 0; //length of the tour
+    auto tour_visitor = make_tsp_tour_len_visitor(
+        myGraph,
+        std::back_inserter(c),
+        len,
+        get(&cEdge::myCost, myGraph));
+    metric_tsp_approx(
+        myGraph,
+        get(&cEdge::myCost, myGraph),
+        get(vertex_index, myGraph),
+        tour_visitor);
+    // metric_tsp_approx_from_vertex(
+    //     myGraph,
+    //     myStart,
+    //     get(&cEdge::myCost, myGraph),
+    //     get(vertex_index, myGraph),
+    //     tour_visitor);
+
+std::cout << "tour length " << c.size() << "\n";
+
+    for (auto itr = c.begin(); itr != c.end(); ++itr)
+        {
+            std::cout << myGraph[*itr].myName << " ";
+        }
+        std::cout << "\n";
+}
+
 void cPathFinder::pathPick(int end)
 {
+    myPath.clear();
     // std::cout << "->cPathFinder::pathPick "
     //     << myStart <<" " << myEnd << "\n";
     // pick out path, starting at goal and finishing at start
