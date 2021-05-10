@@ -21,4 +21,4 @@ An application that finds a path through a maze.  [Detailed Documentation](https
 An application that finds minimum cost links that connect all nodes.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Spans)
 
 ## Sales
-An application that finds minimum cost path that visits all nodes.
+An application that finds minimum cost path that visits all nodes. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Sales)
