@@ -8,10 +8,10 @@
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "enter program name, for example ${workspaceFolder}/a.exe",
-            "args": [],
+            "program": "${workspaceFolder}/../../bin/sales.exe",
+            "args": [ "../dat/city.txt"],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/../../bin",
             "environment": [],
             "console": "externalTerminal"
         }

@@ -74,13 +74,13 @@ public:
         int v,
         float cost);
 
-/// set staring node
+    /// set staring node
     void start(int start)
     {
         myStart = start;
     }
 
-/// set ending node
+    /// set ending node
     void end(int end)
     {
         myEnd = end;
@@ -106,8 +106,6 @@ public:
  */
     void span();
 
-    void tsp();
-
     /// Human readable list of links
     std::string linksText();
 
@@ -123,8 +121,16 @@ public:
      * 
      * render at https://dreampuf.github.io/GraphvizOnline
      * 
+     * or install graphviz and use command
+     * 
+     * dot -Kfdp -n -Tpng -o sample.png sample.dot
+     * 
      */
     std::string pathViz();
+
+    std::string pathViz( 
+        const std::vector< int >& vp,
+        bool all = true );
 
     /** graphical display of graph with spanning tree
      * 
@@ -132,7 +138,7 @@ public:
      * @param[in] all false to see spanning tree
      * @return display in graphviz dot format
      */
-    std::string spanViz( bool all = true );
+    std::string spanViz(bool all = true);
 
     /** Find or add node by name
  * 
@@ -156,6 +162,15 @@ public:
  */
     std::vector<std::string> ParseSpaceDelimited(
         const std::string &l);
+
+    bool IsAdjacent(int u, int v)
+    {
+        return edge(u, v, myGraph).second;
+    }
+    int linkCount()
+    {
+        return num_vertices(myGraph);
+    }
 
 protected:
     /// edge properties
@@ -201,5 +216,5 @@ protected:
     std::vector<std::vector<int>> mySpan; // edges in minimum spanning tree
     int mySpanCost;                       // total cost of links in spanning tree
 
-    std::string namestring( int n );
+    std::string namestring(int n);
 };

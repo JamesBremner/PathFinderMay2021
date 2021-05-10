@@ -1,6 +1,5 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
-#include <boost/graph/metric_tsp_approx.hpp>
 #include "cPathFinder.h"
 using namespace boost;
 
@@ -90,37 +89,6 @@ void cPathFinder::span()
             (int)target(e, myGraph)};
         mySpan.push_back(ve);
     }
-}
-
-
-void cPathFinder::tsp()
-{
-    std::vector<int> c;
-    double len = 0; //length of the tour
-    auto tour_visitor = make_tsp_tour_len_visitor(
-        myGraph,
-        std::back_inserter(c),
-        len,
-        get(&cEdge::myCost, myGraph));
-    metric_tsp_approx(
-        myGraph,
-        get(&cEdge::myCost, myGraph),
-        get(vertex_index, myGraph),
-        tour_visitor);
-    // metric_tsp_approx_from_vertex(
-    //     myGraph,
-    //     myStart,
-    //     get(&cEdge::myCost, myGraph),
-    //     get(vertex_index, myGraph),
-    //     tour_visitor);
-
-std::cout << "tour length " << c.size() << "\n";
-
-    for (auto itr = c.begin(); itr != c.end(); ++itr)
-        {
-            std::cout << myGraph[*itr].myName << " ";
-        }
-        std::cout << "\n";
 }
 
 void cPathFinder::pathPick(int end)
@@ -218,12 +186,12 @@ std::string cPathFinder::linksText()
     return ss.str();
 }
 
-std::string cPathFinder::namestring( int n )
+std::string cPathFinder::namestring(int n)
 {
-        std::string sn = myGraph[n].myName;
-        if (sn == "???")
-            sn = std::to_string(n);  
-        return sn;  
+    std::string sn = myGraph[n].myName;
+    if (sn == "???")
+        sn = std::to_string(n);
+    return sn;
 }
 
 std::string cPathFinder::pathText()
@@ -243,16 +211,16 @@ std::string cPathFinder::pathText()
 
 std::string cPathFinder::spanText()
 {
-    std::cout << "spanText " << mySpan.size() 
-        << " cost "<< mySpanCost << "\n";
+    std::cout << "spanText " << mySpan.size()
+              << " cost " << mySpanCost << "\n";
 
     std::stringstream ss;
     for (auto e : mySpan)
     {
-        ss << namestring( e[0] )
-            << " - "
-            << namestring( e[1] )
-            << ", ";
+        ss << namestring(e[0])
+           << " - "
+           << namestring(e[1])
+           << ", ";
     }
     ss << "\n";
     return ss.str();
@@ -260,28 +228,46 @@ std::string cPathFinder::spanText()
 
 std::string cPathFinder::pathViz()
 {
+    return pathViz(myPath);
+}
+
+std::string cPathFinder::pathViz(
+    const std::vector<int> &vp,
+    bool all)
+{
     std::stringstream f;
     f << "graph G {\n";
     for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v)
-        f << std::to_string(v) << ";\n";
+        f << myGraph[v].myName << ";\n";
 
     graph_traits<graph_t>::edge_iterator ei, ei_end;
     for (tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
     {
+        bool onpath = false;
         int src = source(*ei, myGraph);
         int dst = target(*ei, myGraph);
-        f << std::to_string(src) << "--"
-          << std::to_string(dst) << " ";
-        auto pathItsrc = std::find(myPath.begin(), myPath.end(), src);
-        auto pathItdst = std::find(myPath.begin(), myPath.end(), dst);
-        if (pathItsrc != myPath.end() && pathItdst != myPath.end())
+        auto pathItsrc = std::find(vp.begin(), vp.end(), src);
+        auto pathItdst = std::find(vp.begin(), vp.end(), dst);
+        if (pathItsrc != vp.end() && pathItdst != vp.end())
         {
             if (pathItsrc == pathItdst + 1 || pathItsrc == pathItdst - 1)
-            {
-                f << "[color=\"red\"] ";
-            }
+                onpath = true;
         }
-        f << ";\n";
+
+        if (all)
+        {
+            f << myGraph[src].myName << "--"
+              << myGraph[dst].myName << " ";
+            if (onpath)
+                f << "[color=\"red\"] ";
+            f << ";\n";
+        }
+        else
+        {
+            if (onpath)
+                f << myGraph[src].myName << "--"
+                  << myGraph[dst].myName << " ;\n";
+        }
     }
     f << "}\n";
     return f.str();
@@ -291,16 +277,17 @@ std::string cPathFinder::spanViz(bool all)
 {
     std::stringstream f;
     f << "graph G {\n";
-    for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v) {
+    for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v)
+    {
         auto sn = myGraph[v].myName;
-        int x = atoi( sn.substr(1).c_str() );
-        int y = atoi( sn.substr( sn.find("x")+1).c_str());
-        f << sn 
-            << " [pos=\"" 
-            << std::to_string(x)
-            <<","
-            << std::to_string(y)
-            << "\"];\n";
+        int x = atoi(sn.substr(1).c_str());
+        int y = atoi(sn.substr(sn.find("x") + 1).c_str());
+        f << sn
+          << " [pos=\""
+          << std::to_string(x)
+          << ","
+          << std::to_string(y)
+          << "\"];\n";
     }
 
     graph_traits<graph_t>::edge_iterator ei, ei_end;

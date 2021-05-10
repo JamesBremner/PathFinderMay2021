@@ -30,7 +30,7 @@ MAZES = $(patsubst %,$(ODIR)/%,$(_MAZES))
 _SPANS = spans.o cPathFinder.o cMazePathFinder.o 
 SPANS = $(patsubst %,$(ODIR)/%,$(_SPANS))
 
-_SALES = sales.o cPathFinder.o cMazePathFinder.o 
+_SALES = sales.o cPathFinder.o cSalesPathFinder.o 
 SALES = $(patsubst %,$(ODIR)/%,$(_SALES))
 
 $(ODIR)/%.o: %.cpp $(DEPS)
