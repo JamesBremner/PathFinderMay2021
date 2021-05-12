@@ -26,6 +26,6 @@ main(int argc, char *argv[])
 // display
     std::cout << finder.pathText();
 
-    std::cout << finder.asciiArtText();
+    std::cout << "\n" << finder.asciiArtText();
 
 }

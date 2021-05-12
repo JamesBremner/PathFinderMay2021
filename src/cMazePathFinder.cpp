@@ -2,6 +2,10 @@
 #include "cMazePathFinder.h"
 using namespace boost;
 
+cMazePathFinder::cMazePathFinder()
+    : myFormat(eformat::none)
+{
+}
 void cMazePathFinder::read(
     const std::string &fname)
 {
@@ -12,7 +16,6 @@ void cMazePathFinder::read(
         exit(1);
     }
 
-    bool fascii = false;
     bool even = true;
     myColCount = 0;
     myRowCount = 0;
@@ -22,14 +25,29 @@ void cMazePathFinder::read(
     {
         std::cout << line << "\n";
 
-        if (!myColCount)
+        if (myFormat == eformat::none)
         {
             if (line[0] == '+')
-                fascii = true;
+                myFormat = eformat::art;
+            else if (line[0] == 'c')
+            {
+                myFormat = eformat::cellcost;
+                directed();
+                continue; // jump past first line
+            }
+            else
+                myFormat = eformat::numeric;
         }
-        if (!fascii)
+
+        if (myFormat == eformat::numeric)
         {
             readnumeric(line);
+            continue;
+        }
+
+        if (myFormat == eformat::cellcost)
+        {
+            readcellcost(line);
             continue;
         }
 
@@ -94,8 +112,10 @@ void cMazePathFinder::read(
     }
     std::cout << myColCount << " by " << myRowCount << "\n";
 
-    if (!fascii)
+    if (myFormat == eformat::numeric)
         grid2graph();
+    else if (myFormat == eformat::cellcost)
+        grid2graphcellcost();
 }
 
 void cMazePathFinder::readnumeric(
@@ -131,6 +151,37 @@ void cMazePathFinder::readnumeric(
     }
     myGrid.push_back(row);
     myRowCount++;
+}
+
+void cMazePathFinder::readcellcost(
+    const std::string &line)
+{
+    auto token = ParseSpaceDelimited(line);
+    if (!myColCount)
+        myColCount = token.size();
+    else if (token.size() != myColCount)
+        throw std::runtime_error("Bad column count");
+    std::vector<int> row;
+    for (auto &sc : token)
+    {
+        switch (sc[0])
+        {
+        case 's':
+            myStart = myColCount * myGrid.size() + row.size();
+            sc = sc.substr(1);
+            break;
+        case 'e':
+            myEnd = myColCount * myGrid.size() + row.size();
+            sc = sc.substr(1);
+            break;
+        default:
+            break;
+        }
+        row.push_back(atoi(sc.c_str()));
+    }
+    myGrid.push_back(row);
+    myRowCount = myGrid.size();
+
 }
 
 void cMazePathFinder::grid2graph()
@@ -178,21 +229,55 @@ void cMazePathFinder::grid2graph()
     }
 }
 
+void cMazePathFinder::grid2graphcellcost()
+{
+    for (int row = 0; row < myRowCount; row++)
+    {
+        for (int col = 0; col < myColCount; col++)
+        {
+            int n = row * myColCount + col;
+            if (row > 0)
+                addLink(
+                    n,
+                    (row - 1) * myColCount + col,
+                    myGrid[row - 1][col]);
+            if (col > 0)
+                addLink(
+                    n,
+                    (row)*myColCount + col - 1,
+                    myGrid[row][col - 1]);
+            if( row < myRowCount - 1 )
+                addLink(
+                    n,
+                    (row+1) * myColCount + col,
+                    myGrid[row+1][col] );
+            if( col < myColCount - 1 )
+                addLink(
+                    n,
+                    row * myColCount + col + 1,
+                    myGrid[row][col+1] );
+        }
+    }
+}
+
 std::vector<int> cMazePathFinder::NodesConnected(int v)
 {
     std::vector<int> vc;
+    if( myFormat == eformat::cellcost ) {
+    } else {
     typedef std::pair<graph_traits<graph_t>::out_edge_iterator, graph_traits<graph_t>::out_edge_iterator> out_edge_iter_pair_t;
     for (out_edge_iter_pair_t ep = out_edges(v, myGraph);
          ep.first != ep.second; ++(ep.first))
     {
         vc.push_back(target(*ep.first, myGraph));
     }
+    }
     return vc;
 }
 
 std::string cMazePathFinder::asciiArtText()
 {
-    //std::cout << myRowCount << " rows " << myColCount << " cols\n";
+    //std::cout << "asciiArtText " << myRowCount << " rows " << myColCount << " cols\n";
 
     // construct blank charcter grid
     std::vector<char> r(myColCount * 4 + 1, ' ');
@@ -232,6 +317,7 @@ std::string cMazePathFinder::asciiArtText()
                     n) != myPath.end())
                 grid[row + 1][col + 2] = '*';
 
+            if( myFormat != eformat::cellcost) {
             // connected to previous cell in row
             bool open = false;
             for (int c : vc)
@@ -242,7 +328,7 @@ std::string cMazePathFinder::asciiArtText()
             if (!open)
                 grid[row + 1][col] = '|';
 
-            // connected to cell abone
+            // connected to cell above
             open = false;
             for (int c : vc)
             {
@@ -255,15 +341,15 @@ std::string cMazePathFinder::asciiArtText()
                 grid[row][col + 2] = '-';
                 grid[row][col + 3] = '-';
             }
+            }
 
             // start cell
             if (n == myStart)
-                grid[row + 1][col+2] = 's';
-            
+                grid[row + 1][col + 2] = 's';
+
             // end cell
             if (n == myEnd)
                 grid[row + 1][col + 2] = 'e';
-
         }
 
         // top left corner of last cell in row

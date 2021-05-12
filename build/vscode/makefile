@@ -34,7 +34,7 @@ _SALES = sales.o cPathFinder.o cSalesPathFinder.o
 SALES = $(patsubst %,$(ODIR)/%,$(_SALES))
 
 $(ODIR)/%.o: %.cpp $(DEPS)
-	g++   -std=c++17 -c -o $@ $< $(INCS)
+	g++   -std=c++17 -g -c -o $@ $< $(INCS)
 
 costs: $(OBJ) 
 	g++ -o ../../bin/costs.exe $^ 
@@ -49,7 +49,7 @@ farms: $(FARMS)
 	g++ -o ../../bin/farms.exe $^ 
 
 mazes: $(MAZES)
-	g++ -o ../../bin/mazes.exe $^ 
+	g++ -g -o ../../bin/mazes.exe $^ 
 
 spans: $(SPANS)
 	g++ -o ../../bin/spans.exe $^ 

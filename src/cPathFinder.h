@@ -128,9 +128,9 @@ public:
      */
     std::string pathViz();
 
-    std::string pathViz( 
-        const std::vector< int >& vp,
-        bool all = true );
+    std::string pathViz(
+        const std::vector<int> &vp,
+        bool all = true);
 
     /** graphical display of graph with spanning tree
      * 
@@ -172,6 +172,18 @@ public:
         return num_vertices(myGraph);
     }
 
+    /** set graph links type
+     * 
+     * @param[in] f true for directed, false for undirected, default directed
+     * 
+     * If not called, the graph will be undirected
+     * 
+     */
+    void directed(bool f = true)
+    {
+        myfDirected = f;
+    }
+
 protected:
     /// edge properties
     class cEdge
@@ -207,7 +219,18 @@ protected:
         cEdge>
         graph_t;
 
-    graph_t myGraph;                      // graph
+    graph_t myGraph; // graph
+
+    typedef boost::adjacency_list<
+        boost::listS,
+        boost::vecS,
+        boost::directedS,
+        cNode,
+        cEdge>
+        dir_graph_t;
+
+    dir_graph_t myDirGraph; // graph
+
     int myStart;                          // starting node index
     int myEnd;                            // ending node index
     std::vector<int> myPath;              // vector of node indices visited
@@ -215,6 +238,13 @@ protected:
     std::vector<int> myPred;              // previous node to each node from start
     std::vector<std::vector<int>> mySpan; // edges in minimum spanning tree
     int mySpanCost;                       // total cost of links in spanning tree
+    bool myfDirected;
 
     std::string namestring(int n);
+
+    template <typename T>
+    std::string linksTextT(T &g);
+
+    template <typename T>
+    void pathsT(int start, T &g);
 };

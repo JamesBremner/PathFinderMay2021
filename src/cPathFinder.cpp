@@ -21,6 +21,10 @@ void cPathFinder::read(
             continue;
         switch (token[0][0])
         {
+        case 'g':
+            directed();
+            break;
+            
         case 'l':
             if (token.size() != 4)
                 throw std::runtime_error("cPathFinder::read bad link line");
@@ -47,19 +51,27 @@ void cPathFinder::read(
 
 void cPathFinder::paths(int start)
 {
+    if( ! myfDirected )
+        pathsT( start, myGraph );
+    else
+        pathsT( start, myDirGraph );
+}
+template < typename T >
+void cPathFinder::pathsT(int start, T& g )
+{
     // std::cout << "->cPathFinder::path " << num_vertices(myGraph)
     //     <<" " << myStart << "\n";
     // run dijkstra algorithm
-    myPred.resize(num_vertices(myGraph));
-    myDist.resize(num_vertices(myGraph));
+    myPred.resize(num_vertices(g));
+    myDist.resize(num_vertices(g));
     dijkstra_shortest_paths(
-        myGraph,
+        g,
         start,
-        weight_map(get(&cEdge::myCost, myGraph))
+        weight_map(get(&cEdge::myCost, g))
             .predecessor_map(boost::make_iterator_property_map(
-                myPred.begin(), get(boost::vertex_index, myGraph)))
+                myPred.begin(), get(boost::vertex_index, g)))
             .distance_map(boost::make_iterator_property_map(
-                myDist.begin(), get(boost::vertex_index, myGraph))));
+                myDist.begin(), get(boost::vertex_index, g))));
     // std::cout << "<-cPathFinder::path ";
 }
 
@@ -101,7 +113,7 @@ void cPathFinder::pathPick(int end)
     int prev = end;
     while (1)
     {
-        //std::cout << prev << " " << myPred[prev] << ", ";
+        // std::cout << prev << " " << myPred[prev] << ", ";
         int next = myPred[prev];
         myPath.push_back(next);
         if (next == myStart)
@@ -118,7 +130,10 @@ void cPathFinder::addLink(
     int v,
     float cost)
 {
-    myGraph[add_edge(u, v, myGraph).first].myCost = cost;
+    if (!myfDirected)
+        myGraph[add_edge(u, v, myGraph).first].myCost = cost;
+    else
+        myDirGraph[add_edge(u, v, myDirGraph).first].myCost = cost;
 }
 
 std::vector<std::string> cPathFinder::ParseSpaceDelimited(
@@ -166,20 +181,28 @@ int cPathFinder::find(const std::string &name)
 
 std::string cPathFinder::linksText()
 {
+    if(  ! myfDirected )
+        return linksTextT( myGraph );
+    else
+        return linksTextT( myDirGraph );
+}
+template < typename T >
+std::string cPathFinder::linksTextT( T& g )
+{
     std::stringstream ss;
-    graph_traits<graph_t>::edge_iterator ei, ei_end;
-    for (tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
+    typename graph_traits<T>::edge_iterator ei, ei_end;
+    for (tie(ei, ei_end) = edges(g); ei != ei_end; ++ei)
     {
-        std::string un = myGraph[source(*ei, myGraph)].myName;
+        std::string un = g[source(*ei, g)].myName;
         if (un == "???")
-            un = std::to_string(source(*ei, myGraph));
-        std::string vn = myGraph[target(*ei, myGraph)].myName;
+            un = std::to_string(source(*ei, g));
+        std::string vn = g[target(*ei, g)].myName;
         if (vn == "???")
-            vn = std::to_string(target(*ei, myGraph));
+            vn = std::to_string(target(*ei, g));
         ss << "("
            << un << ","
            << vn << ","
-           << myGraph[*ei].myCost
+           << g[*ei].myCost
            << ") ";
     }
     ss << "\n";
@@ -199,10 +222,11 @@ std::string cPathFinder::pathText()
     std::stringstream ss;
     for (auto n : myPath)
     {
-        std::string sn = myGraph[n].myName;
-        if (sn == "???")
-            sn = std::to_string(n);
-        ss << sn << " -> ";
+        // std::string sn = myGraph[n].myName;
+        // if (sn == "???")
+        //     sn = std::to_string(n);
+        // ss << sn << " -> ";
+        ss << std::to_string(n) << " -> ";
     }
     std::cout << "\n";
     ss << "\n";
