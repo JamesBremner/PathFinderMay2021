@@ -33,6 +33,9 @@ SPANS = $(patsubst %,$(ODIR)/%,$(_SPANS))
 _SALES = sales.o cPathFinder.o cSalesPathFinder.o 
 SALES = $(patsubst %,$(ODIR)/%,$(_SALES))
 
+_COMPS = comps.o cPathFinder.o
+COMPS = $(patsubst %,$(ODIR)/%,$(_COMPS))
+
 $(ODIR)/%.o: %.cpp $(DEPS)
 	g++   -std=c++17 -g -c -o $@ $< $(INCS)
 
@@ -56,6 +59,9 @@ spans: $(SPANS)
 
 sales: $(SALES)
 	g++ -o ../../bin/sales.exe $^ 
+
+comps: $(COMPS)
+	g++ -o ../../bin/comps.exe $^ 
 
 .PHONY: clean
 

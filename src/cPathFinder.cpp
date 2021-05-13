@@ -107,13 +107,18 @@ void cPathFinder::pathPick(int end)
 {
     myPath.clear();
     // std::cout << "->cPathFinder::pathPick "
-    //     << myStart <<" " << myEnd << "\n";
+    //     << myStart <<" " << end << "\n";
+
+    if( myPred[end] == end )
+        throw std::runtime_error("There is no path from "
+            + std::to_string( myStart ) + " to " + std::to_string( end ) );
+
     // pick out path, starting at goal and finishing at start
     myPath.push_back(end);
     int prev = end;
     while (1)
     {
-        // std::cout << prev << " " << myPred[prev] << ", ";
+        //std::cout << prev << " " << myPred[prev] << ", ";
         int next = myPred[prev];
         myPath.push_back(next);
         if (next == myStart)

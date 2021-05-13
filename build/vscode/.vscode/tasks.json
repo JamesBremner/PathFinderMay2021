@@ -103,6 +103,20 @@
 			"group": "build"
 		},	
 		{
+			"label": "make comps",
+			"command": "mingw32-make.exe",
+			"args": [
+				"comps"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},	
+		{
 			"label": "clean",
 			"command": "mingw32-make.exe",
 			"args": [

@@ -79,6 +79,10 @@ public:
     {
         myStart = start;
     }
+    int start() const
+    {
+        return myStart;
+    }
 
     /// set ending node
     void end(int end)
@@ -90,7 +94,7 @@ public:
  *
  * The path from attributes myStart to myEnd is
  * is saved into myPath
- * The path can be listed by call to pathText();
+ * The path can be listed by call to pathText()
  */
     void path();
 
@@ -99,6 +103,13 @@ public:
     void paths(int start);
 
     /** Find path to end node, after call to paths( int start )
+     * 
+     * @param[in] end index of end vertex
+     * 
+     * The path is stored in attribute myPath.
+     * The path can be listed by call to pathText()
+     * 
+     * If no path exists, an exception is thrown.
  */
     void pathPick(int end);
 
@@ -149,7 +160,7 @@ public:
  */
     int findoradd(const std::string &name);
 
-    /** Find or add node by name
+    /** Find node by name
  * 
  * @param[in] name
  * @return node index, -1 if named node does not exist
@@ -238,7 +249,7 @@ protected:
     std::vector<int> myPred;              // previous node to each node from start
     std::vector<std::vector<int>> mySpan; // edges in minimum spanning tree
     int mySpanCost;                       // total cost of links in spanning tree
-    bool myfDirected;
+    bool myfDirected;                     // true if links are directed
 
     std::string namestring(int n);
 
