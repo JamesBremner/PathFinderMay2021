@@ -1,6 +1,28 @@
 # PathFinder Engine
 Discover optimum path through a graph of costed links.  The engine can be used directly to find minimum cost path through the graph, or specialized to model particular problems that need to find paths.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/blob/47984f841d164f6b9cb081440c2eddf63e819075/src/cPathFinder.h#L5-L122)
 
+# Example code
+
+```C++
+   cPathFinder f;
+   
+   // add links
+   f.addLink(
+       f.findoradd("A"),
+       f.findoradd("B"),
+       costAB );
+    ... add rest of links
+    
+    // specify path start and end
+    f.start(f.find("A"));
+    f.end(f.find("B"));
+    
+    // find the path
+    f.path();
+    
+    // display the path
+    std::cout << f.pathText() << "\n";
+```
 # Applications
 
 Applications that model certain problems.
