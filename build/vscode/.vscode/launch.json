@@ -8,7 +8,7 @@
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/../../bin/mazes.exe",
+            "program": "${workspaceFolder}/../../bin/gui.exe",
             "args": [ "../dat/vivekkumar.txt"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../../bin",

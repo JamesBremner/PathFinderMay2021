@@ -22,7 +22,7 @@
  *
  * To refer to nodes by name,
  * rather than keeping track of their indices,
- * use findoradd( std:;string& name )
+ * use findoradd( std::string& name )
  * PathText() will return a list of nodes visited by their name
  * 
  * <pre>
@@ -74,10 +74,16 @@ public:
         int v,
         float cost);
 
+    void clear();
+    
     /// set staring node
     void start(int start)
     {
         myStart = start;
+    }
+    void start( const std::string& start )
+    {
+        myStart = find( start );
     }
     int start() const
     {
@@ -89,7 +95,10 @@ public:
     {
         myEnd = end;
     }
-
+    void end( const std::string& end )
+    {
+        myEnd = find( end );
+    }
     /** Find optimum path from start to end node
  *
  * The path from attributes myStart to myEnd is

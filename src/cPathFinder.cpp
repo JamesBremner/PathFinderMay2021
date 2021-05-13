@@ -3,6 +3,12 @@
 #include "cPathFinder.h"
 using namespace boost;
 
+void cPathFinder::clear()
+{
+    myGraph.clear();
+    myDirGraph.clear();
+}
+
 void cPathFinder::read(
     const std::string &fname)
 {
@@ -29,21 +35,21 @@ void cPathFinder::read(
             if (token.size() != 4)
                 throw std::runtime_error("cPathFinder::read bad link line");
             addLink(
-                atoi(token[1].c_str()),
-                atoi(token[2].c_str()),
+                findoradd(token[1]),
+                findoradd(token[2]),
                 atof(token[3].c_str()));
             break;
 
         case 's':
             if (token.size() != 2)
                 throw std::runtime_error("cPathFinder::read bad start line");
-            myStart = atoi(token[1].c_str());
+            myStart = find(token[1]);
             break;
 
         case 'e':
             if (token.size() != 2)
                 throw std::runtime_error("cPathFinder::read bad end line");
-            myEnd = atoi(token[1].c_str());
+            myEnd = find(token[1]);
             break;
         }
     }
@@ -59,8 +65,8 @@ void cPathFinder::paths(int start)
 template < typename T >
 void cPathFinder::pathsT(int start, T& g )
 {
-    // std::cout << "->cPathFinder::path " << num_vertices(myGraph)
-    //     <<" " << myStart << "\n";
+    std::cout << "->cPathFinder::path " << num_vertices(myGraph)
+        <<" " << myStart << "\n";
     // run dijkstra algorithm
     myPred.resize(num_vertices(g));
     myDist.resize(num_vertices(g));

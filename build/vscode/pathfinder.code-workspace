@@ -74,7 +74,8 @@
 			"cinttypes": "cpp",
 			"variant": "cpp",
 			"strstream": "cpp",
-			"*.ipp": "cpp"
+			"*.ipp": "cpp",
+			"*.rh": "cpp"
 		}
 	}
 }

@@ -117,6 +117,20 @@
 			"group": "build"
 		},	
 		{
+			"label": "make gui",
+			"command": "mingw32-make.exe",
+			"args": [
+				"gui"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},	
+		{
 			"label": "clean",
 			"command": "mingw32-make.exe",
 			"args": [

@@ -7,6 +7,12 @@ INCS = \
 
 DEPS = cPathFinder.h
 
+WEXINC = \
+	-I../../../windex/include
+
+WEXLIBS = \
+	-lgdiplus -lgdi32 -lcomdlg32
+
 # folder for .o files
 ODIR=./obj
 
@@ -36,8 +42,11 @@ SALES = $(patsubst %,$(ODIR)/%,$(_SALES))
 _COMPS = comps.o cPathFinder.o
 COMPS = $(patsubst %,$(ODIR)/%,$(_COMPS))
 
+_GUI = pathgui.o cPathFinder.o
+GUI = $(patsubst %,$(ODIR)/%,$(_GUI))
+
 $(ODIR)/%.o: %.cpp $(DEPS)
-	g++   -std=c++17 -g -c -o $@ $< $(INCS)
+	g++   -std=c++17 -g -c -o $@ $< $(INCS) $(WEXINC)
 
 costs: $(OBJ) 
 	g++ -o ../../bin/costs.exe $^ 
@@ -63,6 +72,8 @@ sales: $(SALES)
 comps: $(COMPS)
 	g++ -o ../../bin/comps.exe $^ 
 
+gui: $(GUI)
+	g++ -o ../../bin/gui.exe $^ $(WEXLIBS)
 .PHONY: clean
 
 clean:
