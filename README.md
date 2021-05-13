@@ -30,6 +30,9 @@ Applications that model certain problems.
 ## Costs
 An application that inputs links, link costs, starting and ending nodes, then uses the PathFinder engine to find optimal path. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Costs)
 
+## GUI
+A graphical user interface version of costs.
+
 ## Turns
 An application that models a robot that can travel either "forwards" or "backwards". The robot moves through a graph whose links may be traversed only forwards, only backwards or in either direction. The robot can turn around only at certain nodes.  Uses the PathFinder engine find the optimal path.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Turns)
 
