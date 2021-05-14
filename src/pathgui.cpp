@@ -1,4 +1,4 @@
-
+#include <filesystem>
 #include "wex.h"
 #include "inputbox.h"
 #include "window2file.h"
@@ -102,6 +102,7 @@ int main()
         finder.path();
         std::cout << finder.pathText() << "\n";
         RunDOT(finder);
+        form.text("Path Finder GUI " + fname );
         form.update();
     });
     mbar.append("File", mfile);
@@ -141,6 +142,9 @@ int main()
         wex::window2file w2f;
         w2f.draw(form, "sample.png");
     });
+
+    std::error_code ec;
+    std::filesystem::remove("sample.png", ec );
 
     // show the application
     form.show();

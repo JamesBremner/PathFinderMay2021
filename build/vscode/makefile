@@ -11,7 +11,7 @@ WEXINC = \
 	-I../../../windex/include
 
 WEXLIBS = \
-	-lgdiplus -lgdi32 -lcomdlg32
+	-lstdc++fs -lgdiplus -lgdi32 -lcomdlg32
 
 # folder for .o files
 ODIR=./obj
@@ -74,6 +74,7 @@ comps: $(COMPS)
 
 gui: $(GUI)
 	g++ -o ../../bin/gui.exe $^ $(WEXLIBS)
+
 .PHONY: clean
 
 clean:
