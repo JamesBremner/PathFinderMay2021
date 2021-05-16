@@ -30,7 +30,7 @@ void cPathFinder::read(
         case 'g':
             directed();
             break;
-            
+
         case 'l':
             if (token.size() != 4)
                 throw std::runtime_error("cPathFinder::read bad link line");
@@ -57,16 +57,16 @@ void cPathFinder::read(
 
 void cPathFinder::paths(int start)
 {
-    if( ! myfDirected )
-        pathsT( start, myGraph );
+    if (!myfDirected)
+        pathsT(start, myGraph);
     else
-        pathsT( start, myDirGraph );
+        pathsT(start, myDirGraph);
 }
-template < typename T >
-void cPathFinder::pathsT(int start, T& g )
+template <typename T>
+void cPathFinder::pathsT(int start, T &g)
 {
     std::cout << "->cPathFinder::path " << num_vertices(myGraph)
-        <<" " << myStart << "\n";
+              << " " << myStart << "\n";
     // run dijkstra algorithm
     myPred.resize(num_vertices(g));
     myDist.resize(num_vertices(g));
@@ -83,8 +83,28 @@ void cPathFinder::pathsT(int start, T& g )
 
 void cPathFinder::path()
 {
+    // run the Dijsktra algorithm
     paths(myStart);
-    pathPick(myEnd);
+
+    if (myEnd >= 0)
+
+        // pick out the path from source to destination
+        pathPick(myEnd);
+
+    else
+    {
+        std::cout << "Hop count from root to every node:\n";
+        for (int kv = 0; kv < num_vertices(myGraph); kv++)
+        {
+            if (kv == myStart)
+                continue;
+            pathPick(kv);
+            //std::cout << pathText() << "\n";
+            std::cout << namestring( myStart ) << " to " 
+                << namestring( kv ) << " " 
+                << myPath.size() - 1 << "\n";
+        }
+    }
 }
 
 void cPathFinder::span()
@@ -115,9 +135,8 @@ void cPathFinder::pathPick(int end)
     // std::cout << "->cPathFinder::pathPick "
     //     << myStart <<" " << end << "\n";
 
-    if( myPred[end] == end )
-        throw std::runtime_error("There is no path from "
-            + std::to_string( myStart ) + " to " + std::to_string( end ) );
+    if (myPred[end] == end)
+        throw std::runtime_error("There is no path from " + std::to_string(myStart) + " to " + std::to_string(end));
 
     // pick out path, starting at goal and finishing at start
     myPath.push_back(end);
@@ -192,13 +211,13 @@ int cPathFinder::find(const std::string &name)
 
 std::string cPathFinder::linksText()
 {
-    if(  ! myfDirected )
-        return linksTextT( myGraph );
+    if (!myfDirected)
+        return linksTextT(myGraph);
     else
-        return linksTextT( myDirGraph );
+        return linksTextT(myDirGraph);
 }
-template < typename T >
-std::string cPathFinder::linksTextT( T& g )
+template <typename T>
+std::string cPathFinder::linksTextT(T &g)
 {
     std::stringstream ss;
     typename graph_traits<T>::edge_iterator ei, ei_end;
