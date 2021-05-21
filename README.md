@@ -1,5 +1,5 @@
 # PathFinder Engine
-Discover optimum path through a graph of costed links.  The engine can be used directly to find minimum cost path through the graph, or specialized to model particular problems that need to find paths.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/blob/47984f841d164f6b9cb081440c2eddf63e819075/src/cPathFinder.h#L5-L122)
+Discover optimum path through a graph of costed links.  The engine can be used directly to find minimum cost path through the graph, or specialized to model particular problems that need to find paths.  [Detailed Documentation](https://jamesbremner.github.io/PathFinder/classc_path_finder.html)
 
 # Example code
 
