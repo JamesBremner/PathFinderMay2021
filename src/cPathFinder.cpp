@@ -1,5 +1,6 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
+#include <boost/graph/connected_components.hpp>
 #include "cPathFinder.h"
 using namespace boost;
 
@@ -35,9 +36,15 @@ void cPathFinder::read(
             if (token.size() != 4)
                 throw std::runtime_error("cPathFinder::read bad link line");
             addLink(
-                findoradd(token[1]),
-                findoradd(token[2]),
+                findoradd("n"+token[1]),
+                findoradd("n"+token[2]),
                 atof(token[3].c_str()));
+            break;
+
+        case 'n':
+            if (token.size() != 3)
+                throw std::runtime_error("cPathFinder::read bad node line");
+            myGraph[ find("n"+token[1]) ].myColor = token[2];
             break;
 
         case 's':
@@ -53,6 +60,7 @@ void cPathFinder::read(
             break;
         }
     }
+    std::cout << "<-cPathFinder::read\n";
 }
 
 void cPathFinder::paths(int start)
@@ -100,9 +108,9 @@ void cPathFinder::path()
                 continue;
             pathPick(kv);
             //std::cout << pathText() << "\n";
-            std::cout << namestring( myStart ) << " to " 
-                << namestring( kv ) << " " 
-                << myPath.size() - 1 << "\n";
+            std::cout << nodeName(myStart) << " to "
+                      << nodeName(kv) << " "
+                      << myPath.size() - 1 << "\n";
         }
     }
 }
@@ -239,7 +247,20 @@ std::string cPathFinder::linksTextT(T &g)
     return ss.str();
 }
 
-std::string cPathFinder::namestring(int n)
+    bool cPathFinder::IsAdjacent(int u, int v)
+    {
+        if( u < 0 || v < 0 )
+            return false;
+        return edge(u, v, myGraph).second;
+    }
+
+bool cPathFinder::IsConnected()
+{
+    std::vector<int> component(boost::num_vertices(myGraph));
+    return( 1 == boost::connected_components(myGraph, &component[0]) );
+}
+
+std::string cPathFinder::nodeName(int n)
 {
     std::string sn = myGraph[n].myName;
     if (sn == "???")
@@ -247,6 +268,10 @@ std::string cPathFinder::namestring(int n)
     return sn;
 }
 
+    std::string cPathFinder::nodeColor( int n )
+    {
+        return myGraph[ n ].myColor;
+    }
 std::string cPathFinder::pathText()
 {
     std::stringstream ss;
@@ -271,14 +296,15 @@ std::string cPathFinder::spanText()
     std::stringstream ss;
     for (auto e : mySpan)
     {
-        ss << namestring(e[0])
+        ss << nodeName(e[0])
            << " - "
-           << namestring(e[1])
+           << nodeName(e[1])
            << ", ";
     }
     ss << "\n";
     return ss.str();
 }
+
 
 std::string cPathFinder::pathViz()
 {
@@ -291,8 +317,10 @@ std::string cPathFinder::pathViz(
 {
     std::stringstream f;
     f << "graph G {\n";
-    for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v)
-        f << myGraph[v].myName << ";\n";
+    for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v) {
+        f << myGraph[v].myName
+        << " [color=\"" <<  myGraph[v].myColor << "\"  penwidth = 3.0 ];\n";
+    }
 
     graph_traits<graph_t>::edge_iterator ei, ei_end;
     for (tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
@@ -323,6 +351,7 @@ std::string cPathFinder::pathViz(
                   << myGraph[dst].myName << " ;\n";
         }
     }
+
     f << "}\n";
     return f.str();
 }

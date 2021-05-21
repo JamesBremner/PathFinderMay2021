@@ -183,14 +183,20 @@ public:
     std::vector<std::string> ParseSpaceDelimited(
         const std::string &l);
 
-    bool IsAdjacent(int u, int v)
-    {
-        return edge(u, v, myGraph).second;
-    }
-    int linkCount()
+    bool IsAdjacent(int u, int v);          /// true if link between nodes
+    bool IsConnected();                     /// true if all nodes are connected together
+
+    int nodeCount()
     {
         return num_vertices(myGraph);
     }
+    int linkCount()
+    {
+        return num_edges( myGraph);
+    }
+
+    std::string nodeColor( int n );
+    std::string nodeName( int n );
 
     /** set graph links type
      * 
@@ -229,6 +235,7 @@ protected:
         {
         }
         std::string myName;
+        std::string myColor;
     };
 
     typedef boost::adjacency_list<
@@ -260,7 +267,7 @@ protected:
     int mySpanCost;                       // total cost of links in spanning tree
     bool myfDirected;                     // true if links are directed
 
-    std::string namestring(int n);
+
 
     template <typename T>
     std::string linksTextT(T &g);
