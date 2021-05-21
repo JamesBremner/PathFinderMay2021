@@ -2,7 +2,7 @@
 #include <fstream>
 #include <boost/graph/adjacency_list.hpp>
 
-/** general purpose path finder
+/** @brief general purpose path finder
  * 
  **** Usage: Node indices
  * 
@@ -43,7 +43,7 @@
 class cPathFinder
 {
 public:
-    /** read input file
+    /** @brief read input file
  *
  * @param[in] fname path to input file.
  *
@@ -60,7 +60,7 @@ public:
     void read(
         const std::string &fname);
 
-    /** Add costed undirected link between two nodes
+    /** @brief Add costed undirected link between two nodes
  *
  * @param[in] u node index
  * @param[in] v node index
@@ -90,16 +90,18 @@ public:
         return myStart;
     }
 
-    /// set ending node
+    /// set ending node, index
     void end(int end)
     {
         myEnd = end;
     }
+
+    /// set ending node, name
     void end( const std::string& end )
     {
         myEnd = find( end );
     }
-    /** Find optimum path from start to end node
+    /** @brief Find optimum path from start to end node
  *
  * The path from attributes myStart to myEnd is
  * is saved into myPath
@@ -111,7 +113,7 @@ public:
  */
     void paths(int start);
 
-    /** Find path to end node, after call to paths( int start )
+    /** @brief Find path to end node, after call to paths( int start )
      * 
      * @param[in] end index of end vertex
      * 
@@ -122,8 +124,7 @@ public:
  */
     void pathPick(int end);
 
-    /** Find minimum edge set that connects all nodes together
- */
+    /// Find minimum edge set that connects all nodes together
     void span();
 
     /// Human readable list of links
@@ -135,7 +136,7 @@ public:
     /// Human readable list of edges that connects all nodes together
     std::string spanText();
 
-    /** graphical display of graph with path in red
+    /** @brief graphical display of graph with path in red.
      * 
      * @return display in graphviz dot format
      * 
@@ -160,7 +161,7 @@ public:
      */
     std::string spanViz(bool all = true);
 
-    /** Find or add node by name
+    /** @brief Find or add node by name
  * 
  * @param[in] name
  * @return node index
@@ -169,22 +170,25 @@ public:
  */
     int findoradd(const std::string &name);
 
-    /** Find node by name
+    /** @brief Find node by name
  * 
  * @param[in] name
  * @return node index, -1 if named node does not exist
  */
     int find(const std::string &name);
 
-    /** Parse Space Delimited line
+    /** @brief Parse Space Delimited line
  * @param[in] l line from a space delimited text file
  * @return vector of strings containing the columns extracted from line
  */
     std::vector<std::string> ParseSpaceDelimited(
         const std::string &l);
 
-    bool IsAdjacent(int u, int v);          /// true if link between nodes
-    bool IsConnected();                     /// true if all nodes are connected together
+/// true if link between nodes
+    bool IsAdjacent(int u, int v);  
+
+ /// true if all nodes are connected together        
+    bool IsConnected();                     
 
     int nodeCount()
     {
@@ -198,7 +202,7 @@ public:
     std::string nodeColor( int n );
     std::string nodeName( int n );
 
-    /** set graph links type
+    /** @brief set graph links type
      * 
      * @param[in] f true for directed, false for undirected, default directed
      * 
