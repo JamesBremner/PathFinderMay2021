@@ -99,10 +99,15 @@ void doPreReqs(
     // loop over required skills
     for (auto &a : va)
     {
+        // skill 0 does not need to be learned
+        if( a == "0" )
+            continue;
+
+        std::cout << "skill " << a << " needs ";
+
         //skills needed to get reuired skill
         auto path = finder.pathPick(finder.find(a));
 
-        std::cout << "skill " << a << " needs ";
         for (int s : path)
             std::cout << finder.nodeName(s) << " ";
         std::cout << "\n";

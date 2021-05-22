@@ -89,6 +89,7 @@ std::vector< std::string > cPathFinderReader::singleParentTree()
 
         case 't':
         {
+            token.erase( token.begin() );
             int child = 0;
             for (auto &t : token)
             {

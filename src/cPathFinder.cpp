@@ -35,8 +35,6 @@ void cPathFinder::paths(int start)
 template <typename T>
 void cPathFinder::pathsT(int start, T &g)
 {
-    std::cout << "->cPathFinder::path " << num_vertices(myGraph)
-              << " " << myStart << "\n";
     // run dijkstra algorithm
     myPred.resize(num_vertices(g));
     myDist.resize(num_vertices(g));
