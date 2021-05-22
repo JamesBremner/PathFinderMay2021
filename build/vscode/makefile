@@ -17,7 +17,7 @@ WEXLIBS = \
 ODIR=./obj
 
 # sources
-_OBJ = costs.o cPathFinder.o
+_OBJ = costs.o cPathFinder.o cPathFinderReader.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 _TURNS = turn.o cPathFinder.o cTurnPathFinder.o
@@ -42,7 +42,7 @@ SALES = $(patsubst %,$(ODIR)/%,$(_SALES))
 _COMPS = comps.o cPathFinder.o
 COMPS = $(patsubst %,$(ODIR)/%,$(_COMPS))
 
-_GUI = pathgui.o cPathFinder.o
+_GUI = pathgui.o cPathFinder.o cPathFinderReader.o
 GUI = $(patsubst %,$(ODIR)/%,$(_GUI))
 
 $(ODIR)/%.o: %.cpp $(DEPS)

@@ -4,6 +4,7 @@
 #include "window2file.h"
 #include <gdiplus.h>
 #include "cPathFinder.h"
+#include "cPathFinderReader.h"
 
 void RunDOT(cPathFinder &finder)
 {
@@ -98,7 +99,10 @@ int main()
         auto fname = fb.open();
         if (fname.empty())
             return;
-        finder.read(fname);
+        cPathFinderReader reader( finder );
+        reader.set( fname );
+        reader.costs();
+
         finder.path();
         std::cout << finder.pathText() << "\n";
         RunDOT(finder);

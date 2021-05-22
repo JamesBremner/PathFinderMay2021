@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <fstream>
 #include <boost/graph/adjacency_list.hpp>
@@ -43,24 +44,8 @@
 class cPathFinder
 {
 public:
-    /** @brief read input file
- *
- * @param[in] fname path to input file.
- *
- * The input file is a space delimited text files
- * specifying the indices of linked nodes, the cost of the links
- * and indices of the starting and ending nodes.
- *
- * File format is specified at https://github.com/JamesBremner/PathFinder/wiki/Costs
- *
- * Specializations with their own file formats should override this method
- * and can use the protected function ParseSpaceDelimited() to assist parsing.
- *
- */
-    void read(
-        const std::string &fname);
 
-    /** @brief Add costed undirected link between two nodes
+ /** @brief Add costed undirected link between two nodes
  *
  * @param[in] u node index
  * @param[in] v node index
@@ -76,19 +61,10 @@ public:
 
     void clear();
     
-    /// set staring node
-    void start(int start)
-    {
-        myStart = start;
-    }
-    void start( const std::string& start )
-    {
-        myStart = find( start );
-    }
-    int start() const
-    {
-        return myStart;
-    }
+    /// set starting node
+    void start(int start);
+    void start( const std::string& start );
+    int start() const;
 
     /// set ending node, index
     void end(int end)
@@ -166,7 +142,7 @@ public:
  * @param[in] name
  * @return node index
  * 
- * If a node of specified nane does not exist, it is added.
+ * If a node of specified name does not exist, it is added.
  */
     int findoradd(const std::string &name);
 
@@ -177,27 +153,14 @@ public:
  */
     int find(const std::string &name);
 
-    /** @brief Parse Space Delimited line
- * @param[in] l line from a space delimited text file
- * @return vector of strings containing the columns extracted from line
- */
-    std::vector<std::string> ParseSpaceDelimited(
-        const std::string &l);
-
 /// true if link between nodes
     bool IsAdjacent(int u, int v);  
 
  /// true if all nodes are connected together        
     bool IsConnected();                     
 
-    int nodeCount()
-    {
-        return num_vertices(myGraph);
-    }
-    int linkCount()
-    {
-        return num_edges( myGraph);
-    }
+    int nodeCount();
+    int linkCount();
 
     std::string nodeColor( int n );
     std::string nodeName( int n );

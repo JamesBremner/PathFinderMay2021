@@ -10,58 +10,20 @@ void cPathFinder::clear()
     myDirGraph.clear();
 }
 
-void cPathFinder::read(
-    const std::string &fname)
-{
-    std::ifstream inf(fname);
-    if (!inf.is_open())
+    void cPathFinder::start(int start)
     {
-        std::cout << "cannot open " << fname << "\n";
-        exit(1);
+        myStart = start;
     }
-    std::string line;
-    while (std::getline(inf, line))
+    void cPathFinder::start( const std::string& start )
     {
-        std::cout << line << "\n";
-        auto token = ParseSpaceDelimited(line);
-        if (!token.size())
-            continue;
-        switch (token[0][0])
-        {
-        case 'g':
-            directed();
-            break;
-
-        case 'l':
-            if (token.size() != 4)
-                throw std::runtime_error("cPathFinder::read bad link line");
-            addLink(
-                findoradd("n"+token[1]),
-                findoradd("n"+token[2]),
-                atof(token[3].c_str()));
-            break;
-
-        case 'n':
-            if (token.size() != 3)
-                throw std::runtime_error("cPathFinder::read bad node line");
-            myGraph[ find("n"+token[1]) ].myColor = token[2];
-            break;
-
-        case 's':
-            if (token.size() != 2)
-                throw std::runtime_error("cPathFinder::read bad start line");
-            myStart = find(token[1]);
-            break;
-
-        case 'e':
-            if (token.size() != 2)
-                throw std::runtime_error("cPathFinder::read bad end line");
-            myEnd = find(token[1]);
-            break;
-        }
+        myStart = find( start );
+        if( myStart < 0 )
+            throw std::runtime_error("cPathFinder::bad start node");
     }
-    std::cout << "<-cPathFinder::read\n";
-}
+    int cPathFinder::start() const
+    {
+        return myStart;
+    }
 
 void cPathFinder::paths(int start)
 {
@@ -91,6 +53,9 @@ void cPathFinder::pathsT(int start, T &g)
 
 void cPathFinder::path()
 {
+    if( myStart < 0 )
+        throw std::runtime_error("cPathFinder::path start node undefined");
+
     // run the Dijsktra algorithm
     paths(myStart);
 
@@ -174,27 +139,6 @@ void cPathFinder::addLink(
         myDirGraph[add_edge(u, v, myDirGraph).first].myCost = cost;
 }
 
-std::vector<std::string> cPathFinder::ParseSpaceDelimited(
-    const std::string &l)
-{
-    std::vector<std::string> token;
-    std::stringstream sst(l);
-    std::string a;
-    while (getline(sst, a, ' '))
-        token.push_back(a);
-
-    token.erase(
-        remove_if(
-            token.begin(),
-            token.end(),
-            [](std::string t) {
-                return (t.empty());
-            }),
-        token.end());
-
-    return token;
-}
-
 int cPathFinder::findoradd(const std::string &name)
 {
     int n = find(name);
@@ -216,6 +160,21 @@ int cPathFinder::find(const std::string &name)
     //std::cout << name << " not found\n";
     return -1;
 }
+
+    int cPathFinder::nodeCount()
+    {
+         if (!myfDirected)
+        return num_vertices(myGraph);
+        else
+        return num_vertices(myDirGraph);
+    }
+    int cPathFinder::linkCount()
+    {
+         if (!myfDirected)
+        return num_edges(myGraph);
+        else
+        return num_edges(myDirGraph);
+    }
 
 std::string cPathFinder::linksText()
 {

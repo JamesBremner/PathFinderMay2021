@@ -1,4 +1,4 @@
-#include "cPathFinder.h"
+#include "cPathFinderReader.h"
 
 main(int argc, char *argv[])
 {
@@ -16,7 +16,9 @@ main(int argc, char *argv[])
     cPathFinder finder;
 
     // read input
-    finder.read( argv[1] );
+    cPathFinderReader reader( finder );
+    reader.set( argv[1] );
+    reader.costs();
 
     std::cout << finder.linksText();
     
