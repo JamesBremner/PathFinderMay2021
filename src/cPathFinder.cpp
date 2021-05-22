@@ -10,20 +10,20 @@ void cPathFinder::clear()
     myDirGraph.clear();
 }
 
-    void cPathFinder::start(int start)
-    {
-        myStart = start;
-    }
-    void cPathFinder::start( const std::string& start )
-    {
-        myStart = find( start );
-        if( myStart < 0 )
-            throw std::runtime_error("cPathFinder::bad start node");
-    }
-    int cPathFinder::start() const
-    {
-        return myStart;
-    }
+void cPathFinder::start(int start)
+{
+    myStart = start;
+}
+void cPathFinder::start(const std::string &start)
+{
+    myStart = find(start);
+    if (myStart < 0)
+        throw std::runtime_error("cPathFinder::bad start node");
+}
+int cPathFinder::start() const
+{
+    return myStart;
+}
 
 void cPathFinder::paths(int start)
 {
@@ -53,7 +53,7 @@ void cPathFinder::pathsT(int start, T &g)
 
 void cPathFinder::path()
 {
-    if( myStart < 0 )
+    if (myStart < 0)
         throw std::runtime_error("cPathFinder::path start node undefined");
 
     // run the Dijsktra algorithm
@@ -80,6 +80,13 @@ void cPathFinder::path()
     }
 }
 
+int cPathFinder::distance(int end)
+{
+    if (0 > end || end >> (int)myDist.size())
+        return -1;
+    return myDist[end];
+}
+
 void cPathFinder::span()
 {
     typedef graph_traits<graph_t>::edge_descriptor edge_t;
@@ -102,12 +109,14 @@ void cPathFinder::span()
     }
 }
 
-void cPathFinder::pathPick(int end)
+std::vector<int> cPathFinder::pathPick(int end)
 {
     myPath.clear();
     // std::cout << "->cPathFinder::pathPick "
     //     << myStart <<" " << end << "\n";
 
+    if (end < 0)
+        throw std::runtime_error("cPathFinder::pathPick bad end node");
     if (myPred[end] == end)
         throw std::runtime_error("There is no path from " + std::to_string(myStart) + " to " + std::to_string(end));
 
@@ -126,6 +135,8 @@ void cPathFinder::pathPick(int end)
 
     // reverse so path goes from start to goal
     std::reverse(myPath.begin(), myPath.end());
+
+    return myPath;
 }
 
 void cPathFinder::addLink(
@@ -133,6 +144,8 @@ void cPathFinder::addLink(
     int v,
     float cost)
 {
+    if (u < 0 || v < 0)
+        throw std::runtime_error("cPathFinder::addLink bad node");
     if (!myfDirected)
         myGraph[add_edge(u, v, myGraph).first].myCost = cost;
     else
@@ -161,20 +174,20 @@ int cPathFinder::find(const std::string &name)
     return -1;
 }
 
-    int cPathFinder::nodeCount()
-    {
-         if (!myfDirected)
+int cPathFinder::nodeCount()
+{
+    if (!myfDirected)
         return num_vertices(myGraph);
-        else
+    else
         return num_vertices(myDirGraph);
-    }
-    int cPathFinder::linkCount()
-    {
-         if (!myfDirected)
+}
+int cPathFinder::linkCount()
+{
+    if (!myfDirected)
         return num_edges(myGraph);
-        else
+    else
         return num_edges(myDirGraph);
-    }
+}
 
 std::string cPathFinder::linksText()
 {
@@ -206,17 +219,17 @@ std::string cPathFinder::linksTextT(T &g)
     return ss.str();
 }
 
-    bool cPathFinder::IsAdjacent(int u, int v)
-    {
-        if( u < 0 || v < 0 )
-            return false;
-        return edge(u, v, myGraph).second;
-    }
+bool cPathFinder::IsAdjacent(int u, int v)
+{
+    if (u < 0 || v < 0)
+        return false;
+    return edge(u, v, myGraph).second;
+}
 
 bool cPathFinder::IsConnected()
 {
     std::vector<int> component(boost::num_vertices(myGraph));
-    return( 1 == boost::connected_components(myGraph, &component[0]) );
+    return (1 == boost::connected_components(myGraph, &component[0]));
 }
 
 std::string cPathFinder::nodeName(int n)
@@ -227,10 +240,10 @@ std::string cPathFinder::nodeName(int n)
     return sn;
 }
 
-    std::string cPathFinder::nodeColor( int n )
-    {
-        return myGraph[ n ].myColor;
-    }
+std::string cPathFinder::nodeColor(int n)
+{
+    return myGraph[n].myColor;
+}
 std::string cPathFinder::pathText()
 {
     std::stringstream ss;
@@ -264,7 +277,6 @@ std::string cPathFinder::spanText()
     return ss.str();
 }
 
-
 std::string cPathFinder::pathViz()
 {
     return pathViz(myPath);
@@ -276,9 +288,10 @@ std::string cPathFinder::pathViz(
 {
     std::stringstream f;
     f << "graph G {\n";
-    for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v) {
+    for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v)
+    {
         f << myGraph[v].myName
-        << " [color=\"" <<  myGraph[v].myColor << "\"  penwidth = 3.0 ];\n";
+          << " [color=\"" << myGraph[v].myColor << "\"  penwidth = 3.0 ];\n";
     }
 
     graph_traits<graph_t>::edge_iterator ei, ei_end;

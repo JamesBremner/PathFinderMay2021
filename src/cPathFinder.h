@@ -98,7 +98,9 @@ public:
      * 
      * If no path exists, an exception is thrown.
  */
-    void pathPick(int end);
+    std::vector<int> pathPick(int end);
+
+    int distance( int end );
 
     /// Find minimum edge set that connects all nodes together
     void span();

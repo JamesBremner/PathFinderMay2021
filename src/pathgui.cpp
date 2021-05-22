@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <set>
 #include "wex.h"
 #include "inputbox.h"
 #include "window2file.h"
@@ -77,9 +78,61 @@ void RunDOT(cPathFinder &finder)
     Sleep(1000);
 }
 
+void doPreReqs(
+    cPathFinder &finder,
+    cPathFinderReader &reader)
+{
+    std::set<int> setSkillsNeeded;
+
+    // read input. va are the required skills
+    auto va = reader.singleParentTree();
+
+    // starting node
+    finder.start("0");
+
+    // paths to all end nodes
+    finder.end(-1);
+
+    // run Dijsktra
+    finder.path();
+
+    // loop over required skills
+    for (auto &a : va)
+    {
+        //skills needed to get reuired skill
+        auto path = finder.pathPick(finder.find(a));
+
+        std::cout << "skill " << a << " needs ";
+        for (int s : path)
+            std::cout << finder.nodeName(s) << " ";
+        std::cout << "\n";
+
+        //loop over prerequsites
+        for (auto s : path)
+        {
+            //record skill if not already learned
+            setSkillsNeeded.insert(s);
+        }
+    }
+
+    std::cout << "Total skills needed "
+              << setSkillsNeeded.size() << " ( ";
+    for (int s : setSkillsNeeded)
+        std::cout << finder.nodeName(s) << " ";
+    std::cout << " )\n";
+}
+
 int main()
 {
     cPathFinder finder;
+
+    enum class eOption
+    {
+        costs,
+        req,
+    };
+
+    eOption opt = eOption::costs;
 
     // construct top level application window
     wex::gui &form = wex::maker::make();
@@ -99,14 +152,24 @@ int main()
         auto fname = fb.open();
         if (fname.empty())
             return;
-        cPathFinderReader reader( finder );
-        reader.set( fname );
-        reader.costs();
+        cPathFinderReader reader(finder);
+        reader.set(fname);
+        switch (opt)
+        {
+        case eOption::costs:
+            reader.costs();
+            finder.path();
+            std::cout << finder.pathText() << "\n";
+            break;
 
-        finder.path();
-        std::cout << finder.pathText() << "\n";
+        case eOption::req:
+            doPreReqs(finder, reader);
+            break;
+        }
+
         RunDOT(finder);
-        form.text("Path Finder GUI " + fname );
+        form.text("Path Finder GUI " + fname);
+
         form.update();
     });
     mbar.append("File", mfile);
@@ -142,13 +205,27 @@ int main()
 
     mbar.append("Add", madd);
 
+    wex::menu mOption(form);
+    mOption.append("Costed Links", [&](const std::string &title) {
+        mOption.check(0);
+        mOption.check(1, false);
+        opt = eOption::costs;
+    });
+    mOption.append("Prerequisites", [&](const std::string &title) {
+        mOption.check(0, false);
+        mOption.check(1);
+        opt = eOption::req;
+    });
+    mOption.check(0);
+    mbar.append("Option", mOption);
+
     form.events().draw([&](PAINTSTRUCT &ps) {
         wex::window2file w2f;
         w2f.draw(form, "sample.png");
     });
 
     std::error_code ec;
-    std::filesystem::remove("sample.png", ec );
+    std::filesystem::remove("sample.png", ec);
 
     // show the application
     form.show();

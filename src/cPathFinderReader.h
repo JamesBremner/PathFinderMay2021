@@ -17,6 +17,8 @@ class cPathFinderReader
 /// Read input file with costed links ( format: https://github.com/JamesBremner/PathFinder/wiki/Costs )
     void costs();
 
+    std::vector< std::string > singleParentTree();
+
 /** Parse Space Delimited line
  * @param[in] l line from a space delimited text file
  * @return vector of strings containing the columns extracted from line

@@ -31,7 +31,6 @@ void cPathFinderReader::costs()
     if (!inf.is_open())
     {
         throw std::runtime_error("cannot open " + myfname);
-        exit(1);
     }
     std::string line;
     while (std::getline(inf, line))
@@ -70,4 +69,46 @@ void cPathFinderReader::costs()
             break;
         }
     }
+}
+
+std::vector< std::string > cPathFinderReader::singleParentTree()
+{
+    std::ifstream inf(myfname);
+    if (!inf.is_open())
+    {
+        throw std::runtime_error("cannot open " + myfname);
+    }
+    std::string line;
+    while (std::getline(inf, line))
+    {
+        auto token = ParseSpaceDelimited(line);
+        if (!token.size())
+            continue;
+        switch (token[0][0])
+        {
+
+        case 't':
+        {
+            int child = 0;
+            for (auto &t : token)
+            {
+                if (!child)
+                {
+                    child++;
+                    continue;
+                }
+                myFinder.addLink(
+                    myFinder.findoradd(t),
+                    myFinder.findoradd(std::to_string(child++)),
+                    1);
+            }
+        }
+        break;
+
+        case 'a':
+            token.erase( token.begin() );
+            return token;
+        }
+    }
+    throw std::runtime_error("no A input");
 }
