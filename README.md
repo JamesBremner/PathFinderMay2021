@@ -36,6 +36,9 @@ An application that inputs links, link costs, starting and ending nodes, then us
 - __Sales.__
 An option that finds minimum cost path that visits all nodes. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Sales)
 
+- __Prerequisites__
+An option that finds paths through ordered requirements.
+
 ## Turns
 An application that models a robot that can travel either "forwards" or "backwards". The robot moves through a graph whose links may be traversed only forwards, only backwards or in either direction. The robot can turn around only at certain nodes.  Uses the PathFinder engine find the optimal path.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Turns)
 
