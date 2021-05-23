@@ -100,6 +100,9 @@ public:
  */
     std::vector<int> pathPick(int end);
 
+    /// Find path that visits every node
+    void tsp();
+
     int distance( int end );
 
     /// Find minimum edge set that connects all nodes together

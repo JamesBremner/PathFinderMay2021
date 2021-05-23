@@ -19,6 +19,8 @@ class cPathFinderReader
 
     std::vector< std::string > singleParentTree();
 
+    void sales();
+
 /** Parse Space Delimited line
  * @param[in] l line from a space delimited text file
  * @return vector of strings containing the columns extracted from line

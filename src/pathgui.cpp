@@ -7,6 +7,13 @@
 #include "cPathFinder.h"
 #include "cPathFinderReader.h"
 
+enum class eOption
+{
+    costs,
+    req,
+    sales,
+};
+
 void RunDOT(cPathFinder &finder)
 {
     std::ofstream f("g.dot");
@@ -100,7 +107,7 @@ void doPreReqs(
     for (auto &a : va)
     {
         // skill 0 does not need to be learned
-        if( a == "0" )
+        if (a == "0")
             continue;
 
         std::cout << "skill " << a << " needs ";
@@ -127,15 +134,19 @@ void doPreReqs(
     std::cout << " )\n";
 }
 
+void ChangeActiveOption(
+    wex::menu &mOption,
+    eOption option)
+{
+    mOption.check(0, false);
+    mOption.check(1, false);
+    mOption.check(2, false);
+    mOption.check((int)option);
+}
+
 int main()
 {
     cPathFinder finder;
-
-    enum class eOption
-    {
-        costs,
-        req,
-    };
 
     eOption opt = eOption::costs;
 
@@ -143,6 +154,8 @@ int main()
     wex::gui &form = wex::maker::make();
     form.move({50, 50, 800, 800});
     form.text("Path Finder GUI");
+
+    wex::panel &graphPanel = wex::maker::make<wex::panel>(form);
 
     wex::menubar mbar(form);
     wex::menu mfile(form);
@@ -169,6 +182,12 @@ int main()
 
         case eOption::req:
             doPreReqs(finder, reader);
+            break;
+
+        case eOption::sales:
+            reader.sales();
+            finder.tsp();
+            std::cout << finder.pathText() << "\n";
             break;
         }
 
@@ -212,21 +231,36 @@ int main()
 
     wex::menu mOption(form);
     mOption.append("Costed Links", [&](const std::string &title) {
-        mOption.check(0);
-        mOption.check(1, false);
         opt = eOption::costs;
+        ChangeActiveOption(mOption, opt);
     });
     mOption.append("Prerequisites", [&](const std::string &title) {
-        mOption.check(0, false);
-        mOption.check(1);
         opt = eOption::req;
+        ChangeActiveOption(mOption, opt);
+    });
+    mOption.append("Sales", [&](const std::string &title) {
+        opt = eOption::sales;
+        ChangeActiveOption(mOption, opt);
+        graphPanel.move(0, 50, 800, 750);
     });
     mOption.check(0);
     mbar.append("Option", mOption);
 
     form.events().draw([&](PAINTSTRUCT &ps) {
+        wex::shapes s(ps);
+        switch (opt)
+        {
+        case eOption::sales:
+            s.text(
+                finder.pathText(),
+                {5, 5});
+            break;
+        }
+    });
+
+    graphPanel.events().draw([&](PAINTSTRUCT &ps) {
         wex::window2file w2f;
-        w2f.draw(form, "sample.png");
+        w2f.draw(graphPanel, "sample.png");
     });
 
     std::error_code ec;

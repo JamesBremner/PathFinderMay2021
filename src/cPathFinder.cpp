@@ -1,6 +1,7 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include <boost/graph/connected_components.hpp>
+#include <boost/graph/metric_tsp_approx.hpp>
 #include "cPathFinder.h"
 using namespace boost;
 
@@ -137,6 +138,28 @@ std::vector<int> cPathFinder::pathPick(int end)
     return myPath;
 }
 
+void cPathFinder::tsp()
+{
+    double len = 0; //length of the tour
+    auto tour_visitor = make_tsp_tour_len_visitor(
+        myGraph,
+        std::back_inserter(myPath),
+        len,
+        get(&cEdge::myCost, myGraph));
+    metric_tsp_approx(
+        myGraph,
+        get(&cEdge::myCost, myGraph),
+        get(vertex_index, myGraph),
+        tour_visitor);
+    // metric_tsp_approx_from_vertex(
+    //     myGraph,
+    //     myStart,
+    //     get(&cEdge::myCost, myGraph),
+    //     get(vertex_index, myGraph),
+    //     tour_visitor);
+
+}
+
 void cPathFinder::addLink(
     int u,
     int v,
@@ -247,11 +270,11 @@ std::string cPathFinder::pathText()
     std::stringstream ss;
     for (auto n : myPath)
     {
-        // std::string sn = myGraph[n].myName;
-        // if (sn == "???")
-        //     sn = std::to_string(n);
-        // ss << sn << " -> ";
-        ss << std::to_string(n) << " -> ";
+        std::string sn = myGraph[n].myName;
+        if (sn == "???")
+            sn = std::to_string(n);
+        ss << sn << " -> ";
+        //ss << std::to_string(n) << " -> ";
     }
     std::cout << "\n";
     ss << "\n";
