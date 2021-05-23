@@ -27,11 +27,14 @@ Discover optimum path through a graph of costed links.  The engine can be used d
 
 Applications that model certain problems.
 
-## Costs
+## GUI
+A graphical user interface to PathFinder.  The following options are available:
+
+- __Costs.__
 An application that inputs links, link costs, starting and ending nodes, then uses the PathFinder engine to find optimal path. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Costs)
 
-## GUI
-A graphical user interface version of costs.
+- __Sales.__
+An option that finds minimum cost path that visits all nodes. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Sales)
 
 ## Turns
 An application that models a robot that can travel either "forwards" or "backwards". The robot moves through a graph whose links may be traversed only forwards, only backwards or in either direction. The robot can turn around only at certain nodes.  Uses the PathFinder engine find the optimal path.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Turns)
@@ -45,5 +48,4 @@ An application that finds a path through a maze.  [Detailed Documentation](https
 ## Spans
 An application that finds minimum cost links that connect all nodes.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Spans)
 
-## Sales
-An application that finds minimum cost path that visits all nodes. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Sales)
+
