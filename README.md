@@ -39,6 +39,9 @@ An option that finds minimum cost path that visits all nodes. [Detailed Document
 - __Prerequisites__
 An option that finds paths through ordered requirements. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Prerequisites)
 
+- __Spans__
+An option that finds minimum cost links that connect all nodes.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Spans)
+
 ## Turns
 An application that models a robot that can travel either "forwards" or "backwards". The robot moves through a graph whose links may be traversed only forwards, only backwards or in either direction. The robot can turn around only at certain nodes.  Uses the PathFinder engine find the optimal path.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Turns)
 
@@ -47,8 +50,4 @@ An application that finds a path through a grid of points with different elevati
 
 ## Mazes
 An application that finds a path through a maze.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Mazes)
-
-## Spans
-An application that finds minimum cost links that connect all nodes.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Spans)
-
 
