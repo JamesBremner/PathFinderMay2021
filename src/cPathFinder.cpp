@@ -290,8 +290,8 @@ std::string cPathFinder::pathText()
 
 std::string cPathFinder::spanText()
 {
-    std::cout << "spanText " << mySpan.size()
-              << " cost " << mySpanCost << "\n";
+    // std::cout << "spanText " << mySpan.size()
+    //           << " cost " << mySpanCost << "\n";
 
     std::stringstream ss;
     for (auto e : mySpan)
@@ -301,7 +301,7 @@ std::string cPathFinder::spanText()
            << nodeName(e[1])
            << ", ";
     }
-    ss << "\n";
+    ss <<" cost " << mySpanCost << "\n";
     return ss.str();
 }
 

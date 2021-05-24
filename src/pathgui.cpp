@@ -12,6 +12,7 @@ enum class eOption
     costs,
     req,
     sales,
+    span,
 };
 
 void RunDOT(cPathFinder &finder)
@@ -19,6 +20,8 @@ void RunDOT(cPathFinder &finder)
     auto path = std::filesystem::temp_directory_path();
     auto gdot = path / "g.dot";
     std::ofstream f(gdot);
+    if( ! f.is_open() )
+        throw std::runtime_error("Cannot open " + gdot.string() );
     f << finder.pathViz() << "\n";
     f.close();
 
@@ -196,13 +199,18 @@ int main()
             finder.tsp();
             std::cout << finder.pathText() << "\n";
             break;
+
+        case eOption::span:
+            reader.costs();
+            finder.span();
+            std::cout << finder.spanText();
+            break;
         }
 
         RunDOT(finder);
         form.text("Path Finder GUI " + fname);
 
         form.update();
-
     });
     mbar.append("File", mfile);
 
@@ -249,7 +257,10 @@ int main()
     mOption.append("Sales", [&](const std::string &title) {
         opt = eOption::sales;
         ChangeActiveOption(mOption, opt);
-        graphPanel.move(0, 50, 800, 750);
+    });
+        mOption.append("Span", [&](const std::string &title) {
+        opt = eOption::span;
+        ChangeActiveOption(mOption, opt);
     });
     mOption.check(0);
     mbar.append("Option", mOption);
@@ -264,6 +275,11 @@ int main()
                 finder.pathText(),
                 {5, 5});
             break;
+        case eOption::span:
+            s.text(
+                finder.spanText(),
+                {5, 5});
+            break;            
         }
     });
 
