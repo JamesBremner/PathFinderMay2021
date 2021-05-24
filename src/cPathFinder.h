@@ -182,6 +182,8 @@ public:
         myfDirected = f;
     }
 
+    void negCost( int cost );
+
 protected:
     /// edge properties
     class cEdge
@@ -238,7 +240,7 @@ protected:
     std::vector<std::vector<int>> mySpan; // edges in minimum spanning tree
     int mySpanCost;                       // total cost of links in spanning tree
     bool myfDirected;                     // true if links are directed
-
+    int myMaxNegCost;
 
 
     template <typename T>

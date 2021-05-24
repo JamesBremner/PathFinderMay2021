@@ -27,11 +27,14 @@ std::vector<std::string> cPathFinderReader::ParseSpaceDelimited(
 
 void cPathFinderReader::costs()
 {
+    myFinder.clear();
     std::ifstream inf(myfname);
     if (!inf.is_open())
     {
         throw std::runtime_error("cannot open " + myfname);
     }
+    int cost;
+    int maxNegCost = 0;
     std::string line;
     while (std::getline(inf, line))
     {
@@ -50,10 +53,13 @@ void cPathFinderReader::costs()
         case 'l':
             if (token.size() != 4)
                 throw std::runtime_error("cPathFinder::read bad link line");
+            cost = atof(token[3].c_str());
+            if( cost < maxNegCost )
+                maxNegCost = cost;
             myFinder.addLink(
                 myFinder.findoradd(token[1]),
                 myFinder.findoradd(token[2]),
-                atof(token[3].c_str()));
+                cost );
             break;
 
         case 's':
@@ -68,6 +74,12 @@ void cPathFinderReader::costs()
             myFinder.end(token[1]);
             break;
         }
+    }
+    if( maxNegCost < 0 )
+    {
+        std::cout << "Negative link costs present\n"
+            << "Adding positive offset to all link costs\n";
+        myFinder.negCost( maxNegCost );
     }
 }
 

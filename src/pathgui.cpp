@@ -16,7 +16,9 @@ enum class eOption
 
 void RunDOT(cPathFinder &finder)
 {
-    std::ofstream f("g.dot");
+    auto path = std::filesystem::temp_directory_path();
+    auto gdot = path / "g.dot";
+    std::ofstream f(gdot);
     f << finder.pathViz() << "\n";
     f.close();
 
@@ -27,8 +29,12 @@ void RunDOT(cPathFinder &finder)
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    char cmd[100];
-    snprintf(cmd, 99, "dot -Kfdp -n -Tpng -o sample.png g.dot");
+    // char cmd[100];
+    // snprintf(cmd, 99, "dot -Kfdp -n -Tpng -o sample.png g.dot");
+
+    std::string scmd = "dot -Kfdp -n -Tpng -o ";
+    auto sample = path / "sample.png";
+    scmd += sample.string() + " " + gdot.string();
 
     // Retain keyboard focus, minimize module2 window
     si.wShowWindow = SW_SHOWNOACTIVATE | SW_MINIMIZE;
@@ -36,16 +42,16 @@ void RunDOT(cPathFinder &finder)
     si.dwX = 600;
     si.dwY = 200;
 
-    if (!CreateProcess(NULL,               // No module name (use command line)
-                       cmd,                // Command line
-                       NULL,               // Process handle not inheritable
-                       NULL,               // Thread handle not inheritable
-                       FALSE,              // Set handle inheritance to FALSE
-                       CREATE_NEW_CONSOLE, //  creation flags
-                       NULL,               // Use parent's environment block
-                       NULL,               // Use parent's starting directory
-                       &si,                // Pointer to STARTUPINFO structure
-                       &pi)                // Pointer to PROCESS_INFORMATION structure
+    if (!CreateProcess(NULL,                 // No module name (use command line)
+                       (char *)scmd.c_str(), // Command line
+                       NULL,                 // Process handle not inheritable
+                       NULL,                 // Thread handle not inheritable
+                       FALSE,                // Set handle inheritance to FALSE
+                       CREATE_NEW_CONSOLE,   //  creation flags
+                       NULL,                 // Use parent's environment block
+                       NULL,                 // Use parent's starting directory
+                       &si,                  // Pointer to STARTUPINFO structure
+                       &pi)                  // Pointer to PROCESS_INFORMATION structure
     )
     {
         int syserrno = GetLastError();
@@ -156,6 +162,7 @@ int main()
     form.text("Path Finder GUI");
 
     wex::panel &graphPanel = wex::maker::make<wex::panel>(form);
+    graphPanel.move(0, 50, 800, 750);
 
     wex::menubar mbar(form);
     wex::menu mfile(form);
@@ -195,6 +202,7 @@ int main()
         form.text("Path Finder GUI " + fname);
 
         form.update();
+
     });
     mbar.append("File", mfile);
 
@@ -250,6 +258,7 @@ int main()
         wex::shapes s(ps);
         switch (opt)
         {
+        case eOption::costs:
         case eOption::sales:
             s.text(
                 finder.pathText(),
@@ -260,11 +269,14 @@ int main()
 
     graphPanel.events().draw([&](PAINTSTRUCT &ps) {
         wex::window2file w2f;
-        w2f.draw(graphPanel, "sample.png");
+        auto path = std::filesystem::temp_directory_path();
+        auto sample = path / "sample.png";
+        w2f.draw(graphPanel, sample.string());
     });
 
     std::error_code ec;
-    std::filesystem::remove("sample.png", ec);
+    std::filesystem::remove(
+        std::filesystem::temp_directory_path() / "sample.png", ec);
 
     // show the application
     form.show();

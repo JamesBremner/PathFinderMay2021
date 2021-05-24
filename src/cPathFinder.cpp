@@ -9,6 +9,7 @@ void cPathFinder::clear()
 {
     myGraph.clear();
     myDirGraph.clear();
+    myMaxNegCost = 0;
 }
 
 void cPathFinder::start(int start)
@@ -157,7 +158,6 @@ void cPathFinder::tsp()
     //     get(&cEdge::myCost, myGraph),
     //     get(vertex_index, myGraph),
     //     tour_visitor);
-
 }
 
 void cPathFinder::addLink(
@@ -276,8 +276,15 @@ std::string cPathFinder::pathText()
         ss << sn << " -> ";
         //ss << std::to_string(n) << " -> ";
     }
-    std::cout << "\n";
-    ss << "\n";
+
+
+    if (myPath.size()) {
+        std::cout << "dbg " << myDist[myPath.back()]<<" "<< myMaxNegCost <<" "<< myPath.size() << "\n";
+        ss << " Cost is " 
+            << myDist[myPath.back()] + myMaxNegCost * ( myPath.size() - 1 )
+            << "\n";
+    }
+
     return ss.str();
 }
 
@@ -296,6 +303,16 @@ std::string cPathFinder::spanText()
     }
     ss << "\n";
     return ss.str();
+}
+
+void cPathFinder::negCost(int cost)
+{
+    graph_traits<graph_t>::edge_iterator ei, ei_end;
+    for (tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
+    {
+        myGraph[*ei].myCost -= cost;
+    }
+    myMaxNegCost = cost;
 }
 
 std::string cPathFinder::pathViz()
