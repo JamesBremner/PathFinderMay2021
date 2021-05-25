@@ -277,12 +277,12 @@ std::string cPathFinder::pathText()
         //ss << std::to_string(n) << " -> ";
     }
 
-
-    if (myPath.size()) {
-        std::cout << "dbg " << myDist[myPath.back()]<<" "<< myMaxNegCost <<" "<< myPath.size() << "\n";
-        ss << " Cost is " 
-            << myDist[myPath.back()] + myMaxNegCost * ( myPath.size() - 1 )
-            << "\n";
+    if (myPath.size())
+    {
+        std::cout << "dbg " << myDist[myPath.back()] << " " << myMaxNegCost << " " << myPath.size() << "\n";
+        ss << " Cost is "
+           << myDist[myPath.back()] + myMaxNegCost * (myPath.size() - 1)
+           << "\n";
     }
 
     return ss.str();
@@ -301,7 +301,7 @@ std::string cPathFinder::spanText()
            << nodeName(e[1])
            << ", ";
     }
-    ss <<" cost " << mySpanCost << "\n";
+    ss << " cost " << mySpanCost << "\n";
     return ss.str();
 }
 
@@ -332,9 +332,11 @@ std::string cPathFinder::pathViz(
           << " [color=\"" << myGraph[v].myColor << "\"  penwidth = 3.0 ];\n";
     }
 
+    // loop over links
     graph_traits<graph_t>::edge_iterator ei, ei_end;
     for (tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
     {
+        // check if link between two nodes on path
         bool onpath = false;
         int src = source(*ei, myGraph);
         int dst = target(*ei, myGraph);
@@ -415,4 +417,67 @@ std::string cPathFinder::spanViz(bool all)
     }
     f << "}\n";
     return f.str();
+}
+
+void cPathFinder::cams()
+{
+    //     APPROXIMATION-VERTEX-COVER(G)=
+    // C = ∅
+    // E'= G.E
+
+    // while E' ≠ ∅:
+    //     let (u, v) be an arbitrary edge of E'
+    //     C = C ∪ {u, v}
+    //     remove from E' every edge incident on either u or v
+
+    // remove all leaf nodes from C
+    // return C
+
+    // store indices of nodes that cover links
+    std::set< int > setCover;
+
+    // graph of links between covering nodes
+    graph_t cover;
+
+    // working copy on input graph
+    auto work = myGraph;
+
+    myPath.clear();
+
+    graph_traits<graph_t>::out_edge_iterator ei, ei_end;
+    
+    // loop until all links are covered
+    while (num_edges(work))
+    {
+        // select first link in working graph
+        auto it = edges(work).first;
+        int u = source(*it, work);
+        int v = target(*it, work);
+        //std::cout << u << " - " << v << "\n"; 
+
+        // add nodes on selected link to cover
+        add_edge(u, v, cover);
+        setCover.insert( u );
+        setCover.insert( v );
+
+        // remove all links that can be seen from new cover nodes
+        for (boost::tie(ei, ei_end) = out_edges(u, work); ei != ei_end; ++ei)
+        {
+            remove_edge(*ei, work);
+        }
+        for (boost::tie(ei, ei_end) = out_edges(v, work); ei != ei_end; ++ei)
+        {
+            remove_edge(*ei, work);
+        }
+    }
+
+    std::cout << "nodes that cover all vertices:\n";
+    for( int u : setCover ) {
+        // exclude edge nodes, their link will be covered from other end
+        if( out_degree( u, myGraph ) > 1 ) {
+            std::cout << u << " ";
+            myGraph[ u ].myColor = "red";
+        }
+    }
+    std::cout << "\n";
 }

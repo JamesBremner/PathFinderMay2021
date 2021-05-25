@@ -184,6 +184,8 @@ public:
 
     void negCost( int cost );
 
+    void cams();
+
 protected:
     /// edge properties
     class cEdge

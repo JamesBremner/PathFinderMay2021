@@ -13,6 +13,7 @@ enum class eOption
     req,
     sales,
     span,
+    cams,
 };
 
 void RunDOT(cPathFinder &finder)
@@ -205,6 +206,11 @@ int main()
             finder.span();
             std::cout << finder.spanText();
             break;
+
+        case eOption::cams:
+            reader.costs();
+            finder.cams();
+            break;
         }
 
         RunDOT(finder);
@@ -260,6 +266,10 @@ int main()
     });
         mOption.append("Span", [&](const std::string &title) {
         opt = eOption::span;
+        ChangeActiveOption(mOption, opt);
+    });
+            mOption.append("Cams", [&](const std::string &title) {
+        opt = eOption::cams;
         ChangeActiveOption(mOption, opt);
     });
     mOption.check(0);
