@@ -42,6 +42,9 @@ An option that finds paths through ordered requirements. [Detailed Documentation
 - __Spans__
 An option that finds minimum cost links that connect all nodes.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Spans)
 
+- __Cams__
+An option that finds a set of nodes that cover every link.
+
 ## Turns
 An application that models a robot that can travel either "forwards" or "backwards". The robot moves through a graph whose links may be traversed only forwards, only backwards or in either direction. The robot can turn around only at certain nodes.  Uses the PathFinder engine find the optimal path.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Turns)
 
