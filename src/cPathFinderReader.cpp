@@ -54,12 +54,12 @@ void cPathFinderReader::costs()
             if (token.size() != 4)
                 throw std::runtime_error("cPathFinder::read bad link line");
             cost = atof(token[3].c_str());
-            if( cost < maxNegCost )
+            if (cost < maxNegCost)
                 maxNegCost = cost;
             myFinder.addLink(
                 myFinder.findoradd(token[1]),
                 myFinder.findoradd(token[2]),
-                cost );
+                cost);
             break;
 
         case 's':
@@ -75,15 +75,15 @@ void cPathFinderReader::costs()
             break;
         }
     }
-    if( maxNegCost < 0 )
+    if (maxNegCost < 0)
     {
         std::cout << "Negative link costs present\n"
-            << "Adding positive offset to all link costs\n";
-        myFinder.negCost( maxNegCost );
+                  << "Adding positive offset to all link costs\n";
+        myFinder.negCost(maxNegCost);
     }
 }
 
-std::vector< std::string > cPathFinderReader::singleParentTree()
+std::vector<std::string> cPathFinderReader::singleParentTree()
 {
     std::ifstream inf(myfname);
     if (!inf.is_open())
@@ -101,7 +101,7 @@ std::vector< std::string > cPathFinderReader::singleParentTree()
 
         case 't':
         {
-            token.erase( token.begin() );
+            token.erase(token.begin());
             int child = 0;
             for (auto &t : token)
             {
@@ -119,7 +119,7 @@ std::vector< std::string > cPathFinderReader::singleParentTree()
         break;
 
         case 'a':
-            token.erase( token.begin() );
+            token.erase(token.begin());
             return token;
         }
     }
@@ -216,9 +216,110 @@ void cPathFinderReader::sales()
             {
                 if (!myFinder.IsAdjacent(c1, c2))
                     myFinder.addLink(c1, c2,
-                                   2000000 );
+                                     2000000);
             }
         }
     }
+}
+
+std::vector<std::vector<float>> cPathFinderReader::orthogonalGrid()
+{
+    const bool fDirected = true;
+
+    myFinder.clear();
+    myFinder.directed( fDirected );
+
+    std::ifstream f(myfname);
+    if (!f.is_open())
+    {
+        throw std::runtime_error("cannot open " + myfname);
+    }
+    std::vector<std::vector<float>> grid;
+    int RowCount = 0;
+    int ColCount = -1;
+    std::string line;
+    while (std::getline(f, line))
+    {
+        std::cout << line << "\n";
+        auto token = ParseSpaceDelimited(line);
+        if (!token.size())
+            continue;
+        switch (token[0][0])
+        {
+        case 'o':
+        {
+            if (ColCount == -1)
+                ColCount = token.size() - 1;
+            else if (token.size() - 1 != ColCount)
+                throw std::runtime_error("Bad column count");
+            std::vector<float> row;
+            for (int k = 1; k < token.size(); k++)
+                row.push_back(atof(token[k].c_str()));
+            grid.push_back(row);
+        }
+        break;
+        case 's':
+            if (token.size() != 3)
+                throw std::runtime_error("Bad start");
+            if (ColCount == -1)
+                throw std::runtime_error("Start node must be at end");
+            myFinder.start( 
+                (atoi(token[2].c_str())-1) * ColCount + atoi(token[1].c_str())-1 );
+            break;
+        case 'e':
+            if (token.size() != 3)
+                throw std::runtime_error("Bad end");
+            if (ColCount == -1)
+                throw std::runtime_error("End node must be at end");
+            myFinder.end(
+                (atoi(token[2].c_str())-1) * ColCount + atoi(token[1].c_str())-1 );
+            break;
+        }
+    }
+    RowCount = grid.size();
+    // std::cout << "<-cHillPathFinder::read " << myRowCount << "\n";
+
+    // add nodes at each grid cell
+    for (int row = 0; row < RowCount; row++)
+    {
+        for (int col = 0; col < ColCount; col++)
+        {
+            int n = myFinder.addNode(
+                "c" + std::to_string(col + 1) + "r" + std::to_string(row + 1) );
+        }
+    }
+
+    // link cells orthogonally
+    for (int row = 0; row < RowCount; row++)
+        for (int col = 0; col < ColCount; col++)
+        {
+            int n = row * ColCount + col;
+
+            if( fDirected ) {
+            if (col > 0)
+            {
+                int left = row * ColCount + col - 1; 
+                myFinder.addLink(n, left, 1);
+            }
+            }
+            if (col < ColCount - 1)
+            {
+                int right = row * ColCount + col + 1; 
+                myFinder.addLink(n, right, 1);
+            }
+            if( fDirected ) {
+            if (row > 0)
+            {
+                int up = (row-1) * ColCount + col; 
+                myFinder.addLink(n, up, 1);
+            }
+            }
+            if (row < RowCount - 1)
+            {
+                int down = (row+1) * ColCount + col; 
+                myFinder.addLink(n, down, 1);
+            }
+        }
+        return grid;
 }
 

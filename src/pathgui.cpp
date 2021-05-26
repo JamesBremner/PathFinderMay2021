@@ -14,15 +14,18 @@ enum class eOption
     sales,
     span,
     cams,
+    ortho,
 };
+
+eOption opt = eOption::costs;
 
 void RunDOT(cPathFinder &finder)
 {
     auto path = std::filesystem::temp_directory_path();
     auto gdot = path / "g.dot";
     std::ofstream f(gdot);
-    if( ! f.is_open() )
-        throw std::runtime_error("Cannot open " + gdot.string() );
+    if (!f.is_open())
+        throw std::runtime_error("Cannot open " + gdot.string());
     f << finder.pathViz() << "\n";
     f.close();
 
@@ -144,6 +147,15 @@ void doPreReqs(
     std::cout << " )\n";
 }
 
+void doHills(
+    cPathFinder &finder,
+    cPathFinderReader &reader)
+{
+    finder.hills( reader.orthogonalGrid() );
+
+
+}
+
 void ChangeActiveOption(
     wex::menu &mOption,
     eOption option)
@@ -154,11 +166,39 @@ void ChangeActiveOption(
     mOption.check((int)option);
 }
 
+void OptionMenuConstructor(
+    wex::menu &mOption)
+{
+    mOption.append("Costed Links", [&](const std::string &title) {
+        opt = eOption::costs;
+        ChangeActiveOption(mOption, opt);
+    });
+    mOption.append("Prerequisites", [&](const std::string &title) {
+        opt = eOption::req;
+        ChangeActiveOption(mOption, opt);
+    });
+    mOption.append("Sales", [&](const std::string &title) {
+        opt = eOption::sales;
+        ChangeActiveOption(mOption, opt);
+    });
+    mOption.append("Span", [&](const std::string &title) {
+        opt = eOption::span;
+        ChangeActiveOption(mOption, opt);
+    });
+    mOption.append("Cams", [&](const std::string &title) {
+        opt = eOption::cams;
+        ChangeActiveOption(mOption, opt);
+    });
+    mOption.append("Hills", [&](const std::string &title) {
+        opt = eOption::ortho;
+        ChangeActiveOption(mOption, opt);
+    });
+    mOption.check(0);
+}
+
 int main()
 {
     cPathFinder finder;
-
-    eOption opt = eOption::costs;
 
     // construct top level application window
     wex::gui &form = wex::maker::make();
@@ -211,6 +251,10 @@ int main()
             reader.costs();
             finder.cams();
             break;
+
+        case eOption::ortho:
+            doHills(finder, reader);
+            break;
         }
 
         RunDOT(finder);
@@ -252,27 +296,7 @@ int main()
     mbar.append("Add", madd);
 
     wex::menu mOption(form);
-    mOption.append("Costed Links", [&](const std::string &title) {
-        opt = eOption::costs;
-        ChangeActiveOption(mOption, opt);
-    });
-    mOption.append("Prerequisites", [&](const std::string &title) {
-        opt = eOption::req;
-        ChangeActiveOption(mOption, opt);
-    });
-    mOption.append("Sales", [&](const std::string &title) {
-        opt = eOption::sales;
-        ChangeActiveOption(mOption, opt);
-    });
-        mOption.append("Span", [&](const std::string &title) {
-        opt = eOption::span;
-        ChangeActiveOption(mOption, opt);
-    });
-            mOption.append("Cams", [&](const std::string &title) {
-        opt = eOption::cams;
-        ChangeActiveOption(mOption, opt);
-    });
-    mOption.check(0);
+    OptionMenuConstructor(mOption);
     mbar.append("Option", mOption);
 
     form.events().draw([&](PAINTSTRUCT &ps) {
@@ -289,7 +313,7 @@ int main()
             s.text(
                 finder.spanText(),
                 {5, 5});
-            break;            
+            break;
         }
     });
 

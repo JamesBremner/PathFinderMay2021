@@ -181,6 +181,14 @@ int cPathFinder::findoradd(const std::string &name)
     return n;
 }
 
+int cPathFinder::addNode(const std::string &name)
+{
+    if (myfDirected)
+        return add_vertex(name, myDirGraph);
+    else
+        return add_vertex(name, myGraph);
+}
+
 int cPathFinder::find(const std::string &name)
 {
     for (int n = 0; n < num_vertices(myGraph); n++)
@@ -270,7 +278,15 @@ std::string cPathFinder::pathText()
     std::stringstream ss;
     for (auto n : myPath)
     {
-        std::string sn = myGraph[n].myName;
+        std::string sn;
+        if (myfDirected)
+        {
+            sn = myDirGraph[n].myName;
+        }
+        else
+        {
+            sn = myGraph[n].myName;
+        }
         if (sn == "???")
             sn = std::to_string(n);
         ss << sn << " -> ";
@@ -324,34 +340,62 @@ std::string cPathFinder::pathViz(
     const std::vector<int> &vp,
     bool all)
 {
-    std::stringstream f;
-    f << "graph G {\n";
-    for (int v = *vertices(myGraph).first; v != *vertices(myGraph).second; ++v)
+    if (myfDirected)
+        return pathVizT(vp, all, myDirGraph);
+    else
+        return pathVizT(vp, all, myGraph);
+}
+
+template <typename T>
+std::string cPathFinder::pathVizT(
+    const std::vector<int> &vp,
+    bool all,
+    T &g)
+{
+    std::string graphvizgraph = "graph";
+    std::string graphvizlink = "--";
+    if (myfDirected)
     {
-        f << myGraph[v].myName
-          << " [color=\"" << myGraph[v].myColor << "\"  penwidth = 3.0 ];\n";
+        graphvizgraph = "digraph";
+        graphvizlink = "->";
+    }
+
+    std::stringstream f;
+    f << graphvizgraph << " G {\n";
+    for (int v = *vertices(g).first; v != *vertices(g).second; ++v)
+    {
+        f << g[v].myName
+          << " [color=\"" << g[v].myColor << "\"  penwidth = 3.0 ];\n";
     }
 
     // loop over links
-    graph_traits<graph_t>::edge_iterator ei, ei_end;
-    for (tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
+    typename graph_traits<T>::edge_iterator ei, ei_end;
+    for (tie(ei, ei_end) = edges(g); ei != ei_end; ++ei)
     {
         // check if link between two nodes on path
         bool onpath = false;
-        int src = source(*ei, myGraph);
-        int dst = target(*ei, myGraph);
+        int src = source(*ei, g);
+        int dst = target(*ei, g);
         auto pathItsrc = std::find(vp.begin(), vp.end(), src);
         auto pathItdst = std::find(vp.begin(), vp.end(), dst);
         if (pathItsrc != vp.end() && pathItdst != vp.end())
         {
-            if (pathItsrc == pathItdst + 1 || pathItsrc == pathItdst - 1)
-                onpath = true;
+            if (myfDirected)
+            {
+                if (pathItsrc == pathItdst - 1)
+                    onpath = true;
+            }
+            else
+            {
+                if (pathItsrc == pathItdst + 1 || pathItsrc == pathItdst - 1)
+                    onpath = true;
+            }
         }
 
         if (all)
         {
-            f << myGraph[src].myName << "--"
-              << myGraph[dst].myName << " ";
+            f << g[src].myName << graphvizlink
+              << g[dst].myName << " ";
             if (onpath)
                 f << "[color=\"red\"] ";
             f << ";\n";
@@ -359,8 +403,8 @@ std::string cPathFinder::pathViz(
         else
         {
             if (onpath)
-                f << myGraph[src].myName << "--"
-                  << myGraph[dst].myName << " ;\n";
+                f << g[src].myName << graphvizlink
+                  << g[dst].myName << " ;\n";
         }
     }
 
@@ -434,7 +478,7 @@ void cPathFinder::cams()
     // return C
 
     // store indices of nodes that cover links
-    std::set< int > setCover;
+    std::set<int> setCover;
 
     // graph of links between covering nodes
     graph_t cover;
@@ -445,7 +489,7 @@ void cPathFinder::cams()
     myPath.clear();
 
     graph_traits<graph_t>::out_edge_iterator ei, ei_end;
-    
+
     // loop until all links are covered
     while (num_edges(work))
     {
@@ -453,12 +497,12 @@ void cPathFinder::cams()
         auto it = edges(work).first;
         int u = source(*it, work);
         int v = target(*it, work);
-        //std::cout << u << " - " << v << "\n"; 
 
-        // add nodes on selected link to cover
-        add_edge(u, v, cover);
-        setCover.insert( u );
-        setCover.insert( v );
+        // add  non leaf nodes on selected link to cover
+        if (out_degree(u, myGraph) > 1)
+            setCover.insert(u);
+        if (out_degree(v, myGraph) > 1)
+            setCover.insert(v);
 
         // remove all links that can be seen from new cover nodes
         for (boost::tie(ei, ei_end) = out_edges(u, work); ei != ei_end; ++ei)
@@ -472,12 +516,38 @@ void cPathFinder::cams()
     }
 
     std::cout << "nodes that cover all vertices:\n";
-    for( int u : setCover ) {
+    for (int u : setCover)
+    {
         // exclude edge nodes, their link will be covered from other end
-        if( out_degree( u, myGraph ) > 1 ) {
-            std::cout << u << " ";
-            myGraph[ u ].myColor = "red";
-        }
+        std::cout << u << " ";
+        myGraph[u].myColor = "red";
     }
     std::cout << "\n";
+}
+
+void cPathFinder::hills(
+    const std::vector<std::vector<float>> &gheight)
+{
+    // cost links according to change in height they incur
+    int rowCount = gheight.size();
+    int colCount = gheight[0].size();
+
+    graph_traits<dir_graph_t>::edge_iterator ei, ei_end;
+    for (boost::tie(ei, ei_end) = edges(myDirGraph); ei != ei_end; ++ei)
+    {
+        int source = boost::source(*ei, myDirGraph);
+        int target = boost::target(*ei, myDirGraph);
+        int srow = source / colCount;
+        int scol = source - srow * colCount;
+        int trow = target / colCount;
+        int tcol = target - trow * colCount;
+        float sh = gheight[srow][scol];
+        float th = gheight[trow][tcol];
+        float delta = th - sh;
+        myDirGraph[*ei].myCost = 1 + delta * delta;
+    }
+
+    path();
+
+    std::cout << "hills " << pathText() << "\n";
 }

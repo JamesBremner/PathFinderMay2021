@@ -44,8 +44,9 @@
 class cPathFinder
 {
 public:
+    void clear();
 
- /** @brief Add costed undirected link between two nodes
+    /** Add costed undirected link between two nodes
  *
  * @param[in] u node index
  * @param[in] v node index
@@ -59,11 +60,20 @@ public:
         int v,
         float cost);
 
-    void clear();
-    
+    int addNode(const std::string &name);
+
+    /** Find or add node by name
+ * 
+ * @param[in] name
+ * @return node index
+ * 
+ * If a node of specified name does not exist, it is added.
+ */
+    int findoradd(const std::string &name);
+
     /// set starting node
     void start(int start);
-    void start( const std::string& start );
+    void start(const std::string &start);
     int start() const;
 
     /// set ending node, index
@@ -73,9 +83,9 @@ public:
     }
 
     /// set ending node, name
-    void end( const std::string& end )
+    void end(const std::string &end)
     {
-        myEnd = find( end );
+        myEnd = find(end);
     }
     /** @brief Find optimum path from start to end node
  *
@@ -100,13 +110,7 @@ public:
  */
     std::vector<int> pathPick(int end);
 
-    /// Find path that visits every node
-    void tsp();
-
-    int distance( int end );
-
-    /// Find minimum edge set that connects all nodes together
-    void span();
+    int distance(int end);
 
     /// Human readable list of links
     std::string linksText();
@@ -142,15 +146,6 @@ public:
      */
     std::string spanViz(bool all = true);
 
-    /** @brief Find or add node by name
- * 
- * @param[in] name
- * @return node index
- * 
- * If a node of specified name does not exist, it is added.
- */
-    int findoradd(const std::string &name);
-
     /** @brief Find node by name
  * 
  * @param[in] name
@@ -158,17 +153,17 @@ public:
  */
     int find(const std::string &name);
 
-/// true if link between nodes
-    bool IsAdjacent(int u, int v);  
+    /// true if link between nodes
+    bool IsAdjacent(int u, int v);
 
- /// true if all nodes are connected together        
-    bool IsConnected();                     
+    /// true if all nodes are connected together
+    bool IsConnected();
 
     int nodeCount();
     int linkCount();
 
-    std::string nodeColor( int n );
-    std::string nodeName( int n );
+    std::string nodeColor(int n);
+    std::string nodeName(int n);
 
     /** @brief set graph links type
      * 
@@ -182,9 +177,20 @@ public:
         myfDirected = f;
     }
 
-    void negCost( int cost );
+    void negCost(int cost);
 
+    /// Find minimum edge set that connects all nodes together
+    void span();
+
+    /// Find path that visits every node
+    void tsp();
+
+    /// Find nodes that cover all links
     void cams();
+
+    /// Find path in grid that minimizes changes in height
+    void hills(
+        const std::vector< std::vector< float >>& gheight );
 
 protected:
     /// edge properties
@@ -244,10 +250,15 @@ protected:
     bool myfDirected;                     // true if links are directed
     int myMaxNegCost;
 
-
     template <typename T>
     std::string linksTextT(T &g);
 
     template <typename T>
     void pathsT(int start, T &g);
+
+    template <typename T>
+    std::string pathVizT(
+        const std::vector<int> &vp,
+        bool all,
+        T &g);
 };
