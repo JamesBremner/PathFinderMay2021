@@ -14,6 +14,17 @@ public:
         myfname = fname;
     }
 
+    enum class eFormat
+    {
+        none,
+        not_open,
+        hills,
+        maze_ascii_art,
+    };
+
+    eFormat open(
+        const std::string &fname );
+
     /// Read input file with costed links ( format: https://github.com/JamesBremner/PathFinder/wiki/Costs )
     void costs();
 
@@ -24,7 +35,7 @@ public:
     void sales();
 
     /** read orthogonal grid of cell values
-     * @return grin od cell values
+     * @return grid of cell values
      */
     std::vector<std::vector<float>>
     orthogonalGrid();
@@ -39,4 +50,5 @@ public:
 private:
     cPathFinder &myFinder;
     std::string myfname;
+    std::ifstream myFile;
 };

@@ -4,6 +4,25 @@
 #include <algorithm>
 #include "cPathFinderReader.h"
 
+cPathFinderReader::eFormat 
+cPathFinderReader::open(const std::string &fname)
+{
+    eFormat ret = eFormat::none;
+    myFile.open(fname);
+    if (!myFile.is_open())
+        return eFormat::not_open;
+    std::string line;
+    getline(myFile,line);
+    if( line.find("format") != 0 )
+        return eFormat::none;
+    if( line.find("hills") != -1 )
+    {
+        myFinder.hills( orthogonalGrid() );
+        return eFormat::hills;
+    }
+    return ret;
+}
+
 std::vector<std::string> cPathFinderReader::ParseSpaceDelimited(
     const std::string &l)
 {
@@ -224,21 +243,20 @@ void cPathFinderReader::sales()
 
 std::vector<std::vector<float>> cPathFinderReader::orthogonalGrid()
 {
+    if( ! myFile.is_open() )
+        throw std::runtime_error(
+            "cPathFinderReader::orthogonalGrid file not open");
+
     const bool fDirected = true;
 
     myFinder.clear();
-    myFinder.directed( fDirected );
+    myFinder.directed(fDirected);
 
-    std::ifstream f(myfname);
-    if (!f.is_open())
-    {
-        throw std::runtime_error("cannot open " + myfname);
-    }
     std::vector<std::vector<float>> grid;
     int RowCount = 0;
     int ColCount = -1;
     std::string line;
-    while (std::getline(f, line))
+    while (std::getline(myFile, line))
     {
         std::cout << line << "\n";
         auto token = ParseSpaceDelimited(line);
@@ -263,8 +281,8 @@ std::vector<std::vector<float>> cPathFinderReader::orthogonalGrid()
                 throw std::runtime_error("Bad start");
             if (ColCount == -1)
                 throw std::runtime_error("Start node must be at end");
-            myFinder.start( 
-                (atoi(token[2].c_str())-1) * ColCount + atoi(token[1].c_str())-1 );
+            myFinder.start(
+                (atoi(token[2].c_str()) - 1) * ColCount + atoi(token[1].c_str()) - 1);
             break;
         case 'e':
             if (token.size() != 3)
@@ -272,7 +290,7 @@ std::vector<std::vector<float>> cPathFinderReader::orthogonalGrid()
             if (ColCount == -1)
                 throw std::runtime_error("End node must be at end");
             myFinder.end(
-                (atoi(token[2].c_str())-1) * ColCount + atoi(token[1].c_str())-1 );
+                (atoi(token[2].c_str()) - 1) * ColCount + atoi(token[1].c_str()) - 1);
             break;
         }
     }
@@ -285,7 +303,7 @@ std::vector<std::vector<float>> cPathFinderReader::orthogonalGrid()
         for (int col = 0; col < ColCount; col++)
         {
             int n = myFinder.addNode(
-                "c" + std::to_string(col + 1) + "r" + std::to_string(row + 1) );
+                "c" + std::to_string(col + 1) + "r" + std::to_string(row + 1));
         }
     }
 
@@ -295,31 +313,32 @@ std::vector<std::vector<float>> cPathFinderReader::orthogonalGrid()
         {
             int n = row * ColCount + col;
 
-            if( fDirected ) {
-            if (col > 0)
+            if (fDirected)
             {
-                int left = row * ColCount + col - 1; 
-                myFinder.addLink(n, left, 1);
-            }
+                if (col > 0)
+                {
+                    int left = row * ColCount + col - 1;
+                    myFinder.addLink(n, left, 1);
+                }
             }
             if (col < ColCount - 1)
             {
-                int right = row * ColCount + col + 1; 
+                int right = row * ColCount + col + 1;
                 myFinder.addLink(n, right, 1);
             }
-            if( fDirected ) {
-            if (row > 0)
+            if (fDirected)
             {
-                int up = (row-1) * ColCount + col; 
-                myFinder.addLink(n, up, 1);
-            }
+                if (row > 0)
+                {
+                    int up = (row - 1) * ColCount + col;
+                    myFinder.addLink(n, up, 1);
+                }
             }
             if (row < RowCount - 1)
             {
-                int down = (row+1) * ColCount + col; 
+                int down = (row + 1) * ColCount + col;
                 myFinder.addLink(n, down, 1);
             }
         }
-        return grid;
+    return grid;
 }
-

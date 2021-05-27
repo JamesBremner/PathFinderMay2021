@@ -9,6 +9,7 @@
 
 enum class eOption
 {
+    file,
     costs,
     req,
     sales,
@@ -17,7 +18,19 @@ enum class eOption
     ortho,
 };
 
-eOption opt = eOption::costs;
+eOption opt = eOption::file;
+
+void replaceAll(std::string &str, const std::string &from, const std::string &to)
+{
+    if (from.empty())
+        return;
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
+}
 
 void RunDOT(cPathFinder &finder)
 {
@@ -147,15 +160,6 @@ void doPreReqs(
     std::cout << " )\n";
 }
 
-void doHills(
-    cPathFinder &finder,
-    cPathFinderReader &reader)
-{
-    finder.hills( reader.orthogonalGrid() );
-
-
-}
-
 void ChangeActiveOption(
     wex::menu &mOption,
     eOption option)
@@ -169,6 +173,10 @@ void ChangeActiveOption(
 void OptionMenuConstructor(
     wex::menu &mOption)
 {
+    mOption.append("File", [&](const std::string &title) {
+        opt = eOption::costs;
+        ChangeActiveOption(mOption, opt);
+    });
     mOption.append("Costed Links", [&](const std::string &title) {
         opt = eOption::costs;
         ChangeActiveOption(mOption, opt);
@@ -208,6 +216,12 @@ int main()
     wex::panel &graphPanel = wex::maker::make<wex::panel>(form);
     graphPanel.move(0, 50, 800, 750);
 
+    wex::multiline &editPanel = wex::maker::make<wex::multiline>(form);
+    editPanel.move(0, 0, 800, 800);
+    editPanel.text("");
+    editPanel.fontName("courier");
+    editPanel.fontHeight(18);
+
     wex::menubar mbar(form);
     wex::menu mfile(form);
     mfile.append("New", [&](const std::string &title) {
@@ -215,49 +229,96 @@ int main()
         RunDOT(finder);
         form.update();
     });
-    mfile.append("Open", [&](const std::string &title) {
+    mfile.append("Edit", [&](const std::string &title) {
+        wex::filebox fb(form);
+        auto fname = fb.open();
+        if (fname.empty())
+            return;
+        std::ifstream f(fname);
+        if (!f.is_open())
+            throw std::runtime_error("Cannot open " + fname);
+        std::stringstream buffer;
+        buffer << f.rdbuf();
+        auto snr = buffer.str();
+        replaceAll(snr, "\n", "\r\n");
+        editPanel.text(snr);
+        editPanel.show();
+        graphPanel.show(false);
+        editPanel.update();
+        return;
+    });
+    mfile.append("Calculate", [&](const std::string &title) {
         finder.clear();
         wex::filebox fb(form);
         auto fname = fb.open();
         if (fname.empty())
             return;
         cPathFinderReader reader(finder);
-        reader.set(fname);
-        switch (opt)
+        if (opt == eOption::file)
         {
-        case eOption::costs:
-            reader.costs();
-            finder.path();
-            std::cout << finder.pathText() << "\n";
-            break;
+            try
+            {
+                switch (reader.open(fname))
+                {
+                case cPathFinderReader::eFormat::none:
+                    throw std::runtime_error(
+                        "File format not specified");
+                case cPathFinderReader::eFormat::not_open:
+                    throw std::runtime_error(
+                        "Cannot open " + fname);
 
-        case eOption::req:
-            doPreReqs(finder, reader);
-            break;
+                case cPathFinderReader::eFormat::hills:
+                    break;
+                case cPathFinderReader::eFormat::maze_ascii_art:
+                    break;
+                    
+                default:
+                    throw std::runtime_error(
+                        "UNrecognized file format");
+                }
+            }
+            catch (std::runtime_error &e)
+            {
+                wex::msgbox m(e.what());
+                return;
+            }
+        }
+        else
+        {
+            reader.set(fname);
+            switch (opt)
+            {
+            case eOption::costs:
+                reader.costs();
+                finder.path();
+                std::cout << finder.pathText() << "\n";
+                break;
 
-        case eOption::sales:
-            reader.sales();
-            finder.tsp();
-            std::cout << finder.pathText() << "\n";
-            break;
+            case eOption::req:
+                doPreReqs(finder, reader);
+                break;
 
-        case eOption::span:
-            reader.costs();
-            finder.span();
-            std::cout << finder.spanText();
-            break;
+            case eOption::sales:
+                reader.sales();
+                finder.tsp();
+                std::cout << finder.pathText() << "\n";
+                break;
 
-        case eOption::cams:
-            reader.costs();
-            finder.cams();
-            break;
+            case eOption::span:
+                reader.costs();
+                finder.span();
+                std::cout << finder.spanText();
+                break;
 
-        case eOption::ortho:
-            doHills(finder, reader);
-            break;
+            case eOption::cams:
+                reader.costs();
+                finder.cams();
+                break;
+            }
         }
 
         RunDOT(finder);
+        editPanel.show( false );
         form.text("Path Finder GUI " + fname);
 
         form.update();

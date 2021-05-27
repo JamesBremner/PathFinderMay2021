@@ -528,8 +528,12 @@ void cPathFinder::cams()
 void cPathFinder::hills(
     const std::vector<std::vector<float>> &gheight)
 {
+
     // cost links according to change in height they incur
     int rowCount = gheight.size();
+    if( ! rowCount )
+        throw std::runtime_error(
+            "cPathFinder::hills bad grid");
     int colCount = gheight[0].size();
 
     graph_traits<dir_graph_t>::edge_iterator ei, ei_end;
