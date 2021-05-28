@@ -193,14 +193,7 @@ void OptionMenuConstructor(
         opt = eOption::span;
         ChangeActiveOption(mOption, opt);
     });
-    mOption.append("Cams", [&](const std::string &title) {
-        opt = eOption::cams;
-        ChangeActiveOption(mOption, opt);
-    });
-    mOption.append("Hills", [&](const std::string &title) {
-        opt = eOption::ortho;
-        ChangeActiveOption(mOption, opt);
-    });
+
     mOption.check(0);
 }
 
@@ -245,8 +238,21 @@ int main()
         editPanel.show();
         graphPanel.show(false);
         editPanel.update();
-        return;
     });
+    mfile.append("Save", [&](const std::string &title) {
+        wex::filebox fb(form);
+        auto fname = fb.save();
+        if (fname.empty())
+            return;  
+        std::ofstream f(fname);
+        if (!f.is_open()) {
+            wex::msgbox m("Cannot open " + fname);
+            return;
+        }
+        auto s = editPanel.text();  
+        replaceAll(s,"\r\n","\n" );
+        f << s;
+        });  
     mfile.append("Calculate", [&](const std::string &title) {
         finder.clear();
         wex::filebox fb(form);
@@ -268,10 +274,10 @@ int main()
                         "Cannot open " + fname);
 
                 case cPathFinderReader::eFormat::hills:
-                    break;
+                case cPathFinderReader::eFormat::cams:
                 case cPathFinderReader::eFormat::maze_ascii_art:
                     break;
-                    
+
                 default:
                     throw std::runtime_error(
                         "UNrecognized file format");
@@ -309,16 +315,11 @@ int main()
                 finder.span();
                 std::cout << finder.spanText();
                 break;
-
-            case eOption::cams:
-                reader.costs();
-                finder.cams();
-                break;
             }
         }
 
         RunDOT(finder);
-        editPanel.show( false );
+        editPanel.show(false);
         form.text("Path Finder GUI " + fname);
 
         form.update();

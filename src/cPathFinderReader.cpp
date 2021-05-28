@@ -20,6 +20,12 @@ cPathFinderReader::open(const std::string &fname)
         myFinder.hills( orthogonalGrid() );
         return eFormat::hills;
     }
+    if( line.find("cams") != -1 )
+    {
+        costs();
+        myFinder.cams();
+        return eFormat::cams;
+    }
     return ret;
 }
 
@@ -47,15 +53,10 @@ std::vector<std::string> cPathFinderReader::ParseSpaceDelimited(
 void cPathFinderReader::costs()
 {
     myFinder.clear();
-    std::ifstream inf(myfname);
-    if (!inf.is_open())
-    {
-        throw std::runtime_error("cannot open " + myfname);
-    }
     int cost;
     int maxNegCost = 0;
     std::string line;
-    while (std::getline(inf, line))
+    while (std::getline(myFile, line))
     {
         std::cout << line << "\n";
         auto token = ParseSpaceDelimited(line);

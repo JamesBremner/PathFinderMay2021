@@ -19,6 +19,7 @@ public:
         none,
         not_open,
         hills,
+        cams,
         maze_ascii_art,
     };
 
