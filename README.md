@@ -43,7 +43,7 @@ An option that finds paths through ordered requirements. [Detailed Documentation
 An option that finds minimum cost links that connect all nodes.  [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Spans)
 
 - __Cams__
-An option that finds a set of nodes that cover every link.
+An option that finds a set of nodes that cover every link. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Cams)
 
 - __Hills__
 An option that finds a path through a grid of points with different elevations that minimises the changes in elevation. [Detailed Documentation](https://github.com/JamesBremner/PathFinder/wiki/Hills)
