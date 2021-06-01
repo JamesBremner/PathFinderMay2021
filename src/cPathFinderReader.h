@@ -18,16 +18,34 @@ public:
     {
         none,
         not_open,
+        costs,
+        spans,
+        sales,
         hills,
         cams,
+        gsingh,
+        shaun,
+        islands,
         maze_ascii_art,
     };
 
+    /** Open file, determine format and read data into pathfinder
+     * @param[in] fname to open
+     * @return format
+     */
     eFormat open(
-        const std::string &fname );
+        const std::string &fname);
 
-    /// Read input file with costed links ( format: https://github.com/JamesBremner/PathFinder/wiki/Costs )
-    void costs();
+    /** Read input file with costed links 
+     * 
+     *  @param[in] weights true if required, false if not, default true
+     * 
+     *  format: https://github.com/JamesBremner/PathFinder/wiki/Costs 
+     * 
+     * If weights is false, then input lines may have just three columns,
+     * and cost of 1 will be assigned to link
+     */
+    void costs(bool weights = true);
 
     /// read tree
     std::vector<std::string> singleParentTree();
@@ -41,6 +59,18 @@ public:
     std::vector<std::vector<float>>
     orthogonalGrid();
 
+    /// read uncosted links, multiple links from one source on one line
+    void multi();
+
+    void shaun();
+
+    void islands();
+
+private:
+    cPathFinder &myFinder;
+    std::string myfname;
+    std::ifstream myFile;
+
     /** Parse Space Delimited line
  * @param[in] l line from a space delimited text file
  * @return vector of strings containing the columns extracted from line
@@ -48,8 +78,6 @@ public:
     std::vector<std::string> ParseSpaceDelimited(
         const std::string &l);
 
-private:
-    cPathFinder &myFinder;
-    std::string myfname;
-    std::ifstream myFile;
+        std::string orthogonalGridNodeName(
+            int row, int col );
 };

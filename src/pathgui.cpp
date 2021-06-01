@@ -16,6 +16,7 @@ enum class eOption
     span,
     cams,
     ortho,
+    islands,
 };
 
 eOption opt = eOption::file;
@@ -177,20 +178,8 @@ void OptionMenuConstructor(
         opt = eOption::costs;
         ChangeActiveOption(mOption, opt);
     });
-    mOption.append("Costed Links", [&](const std::string &title) {
-        opt = eOption::costs;
-        ChangeActiveOption(mOption, opt);
-    });
     mOption.append("Prerequisites", [&](const std::string &title) {
         opt = eOption::req;
-        ChangeActiveOption(mOption, opt);
-    });
-    mOption.append("Sales", [&](const std::string &title) {
-        opt = eOption::sales;
-        ChangeActiveOption(mOption, opt);
-    });
-    mOption.append("Span", [&](const std::string &title) {
-        opt = eOption::span;
         ChangeActiveOption(mOption, opt);
     });
 
@@ -273,8 +262,17 @@ int main()
                     throw std::runtime_error(
                         "Cannot open " + fname);
 
+                case cPathFinderReader::eFormat::costs:
+                case cPathFinderReader::eFormat::spans:
+                case cPathFinderReader::eFormat::sales:
                 case cPathFinderReader::eFormat::hills:
                 case cPathFinderReader::eFormat::cams:
+                case cPathFinderReader::eFormat::gsingh:
+                case cPathFinderReader::eFormat::shaun:
+                    break;
+                case cPathFinderReader::eFormat::islands:
+                    opt = eOption::islands;
+                    break;
                 case cPathFinderReader::eFormat::maze_ascii_art:
                     break;
 
@@ -294,27 +292,11 @@ int main()
             reader.set(fname);
             switch (opt)
             {
-            case eOption::costs:
-                reader.costs();
-                finder.path();
-                std::cout << finder.pathText() << "\n";
-                break;
 
             case eOption::req:
                 doPreReqs(finder, reader);
                 break;
 
-            case eOption::sales:
-                reader.sales();
-                finder.tsp();
-                std::cout << finder.pathText() << "\n";
-                break;
-
-            case eOption::span:
-                reader.costs();
-                finder.span();
-                std::cout << finder.spanText();
-                break;
             }
         }
 
@@ -374,6 +356,11 @@ int main()
         case eOption::span:
             s.text(
                 finder.spanText(),
+                {5, 5});
+            break;
+        case eOption::islands:
+            s.text(
+                "There are " + std::to_string( finder.islandCount() ) + " islands",
                 {5, 5});
             break;
         }

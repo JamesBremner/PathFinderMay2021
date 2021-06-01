@@ -60,6 +60,11 @@ public:
         int v,
         float cost);
 
+    void addLink(
+        const std::string &su,
+        const std::string &sv,
+        float cost);
+
     int addNode(const std::string &name);
 
     /** Find or add node by name
@@ -70,6 +75,8 @@ public:
  * If a node of specified name does not exist, it is added.
  */
     int findoradd(const std::string &name);
+
+    void deleteNode(int n);
 
     /// set starting node
     void start(int start);
@@ -89,7 +96,7 @@ public:
     }
     /** @brief Find optimum path from start to end node
  *
- * The path from attributes myStart to myEnd is
+ * The path from attributes myStart to myEnd
  * is saved into myPath
  * The path can be listed by call to pathText()
  */
@@ -161,9 +168,11 @@ public:
 
     int nodeCount();
     int linkCount();
+    int islandCount();
 
-    std::string nodeColor(int n);
-    std::string nodeName(int n);
+    std::string nodeColor(int n) const;
+    void nodeColor(int n, const std::string &color);
+    std::string nodeName(int n) const;
 
     /** @brief set graph links type
      * 
@@ -177,7 +186,16 @@ public:
         myfDirected = f;
     }
 
-    void negCost(int cost);
+    /// add expensive ( INT_MAX ) links between unlinked nodes
+    void makeComplete();
+
+    /** make costs positive
+     * @param[in] cost the maximum negative cost
+     * 
+     * The absolute value of cost will be added to every cost
+     * cost will be saved to to attribute myMaxNegCost
+     */
+    void makeCostsPositive(int cost);
 
     /// Find minimum edge set that connects all nodes together
     void span();
@@ -190,7 +208,11 @@ public:
 
     /// Find path in grid that minimizes changes in height
     void hills(
-        const std::vector< std::vector< float >>& gheight );
+        const std::vector<std::vector<float>> &gheight);
+
+    void gsingh();
+
+    void shaun();
 
 protected:
     /// edge properties

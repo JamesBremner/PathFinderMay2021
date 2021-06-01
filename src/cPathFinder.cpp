@@ -38,6 +38,8 @@ template <typename T>
 void cPathFinder::pathsT(int start, T &g)
 {
     // run dijkstra algorithm
+    myPred.clear();
+    myDist.clear();
     myPred.resize(num_vertices(g));
     myDist.resize(num_vertices(g));
     dijkstra_shortest_paths(
@@ -141,6 +143,10 @@ std::vector<int> cPathFinder::pathPick(int end)
 
 void cPathFinder::tsp()
 {
+    if (myfDirected)
+        throw std::runtime_error(
+            "cPathFinder::tsp does not handle directed graphs");
+
     double len = 0; //length of the tour
     auto tour_visitor = make_tsp_tour_len_visitor(
         myGraph,
@@ -173,6 +179,17 @@ void cPathFinder::addLink(
         myDirGraph[add_edge(u, v, myDirGraph).first].myCost = cost;
 }
 
+void cPathFinder::addLink(
+    const std::string &su,
+    const std::string &sv,
+    float cost)
+{
+    addLink(
+        findoradd(su),
+        findoradd(sv),
+        cost);
+}
+
 int cPathFinder::findoradd(const std::string &name)
 {
     int n = find(name);
@@ -189,6 +206,13 @@ int cPathFinder::addNode(const std::string &name)
         return add_vertex(name, myGraph);
 }
 
+void cPathFinder::deleteNode(int n)
+{
+    if (myfDirected)
+        return remove_vertex(n, myDirGraph);
+    else
+        return remove_vertex(n, myGraph);
+}
 int cPathFinder::find(const std::string &name)
 {
     for (int n = 0; n < num_vertices(myGraph); n++)
@@ -257,11 +281,15 @@ bool cPathFinder::IsAdjacent(int u, int v)
 
 bool cPathFinder::IsConnected()
 {
+    return (1 == islandCount());
+}
+int cPathFinder::islandCount()
+{
     std::vector<int> component(boost::num_vertices(myGraph));
-    return (1 == boost::connected_components(myGraph, &component[0]));
+    return boost::connected_components(myGraph, &component[0]);
 }
 
-std::string cPathFinder::nodeName(int n)
+std::string cPathFinder::nodeName(int n) const
 {
     std::string sn = myGraph[n].myName;
     if (sn == "???")
@@ -269,9 +297,16 @@ std::string cPathFinder::nodeName(int n)
     return sn;
 }
 
-std::string cPathFinder::nodeColor(int n)
+std::string cPathFinder::nodeColor(int n) const
 {
     return myGraph[n].myColor;
+}
+void cPathFinder::nodeColor(int n, const std::string &color)
+{
+    if (myfDirected)
+        myDirGraph[n].myColor = color;
+    else
+        myGraph[n].myColor = color;
 }
 std::string cPathFinder::pathText()
 {
@@ -295,7 +330,7 @@ std::string cPathFinder::pathText()
 
     if (myPath.size())
     {
-        std::cout << "dbg " << myDist[myPath.back()] << " " << myMaxNegCost << " " << myPath.size() << "\n";
+        //std::cout << "dbg " << myDist[myPath.back()] << " " << myMaxNegCost << " " << myPath.size() << "\n";
         ss << " Cost is "
            << myDist[myPath.back()] + myMaxNegCost * (myPath.size() - 1)
            << "\n";
@@ -321,7 +356,7 @@ std::string cPathFinder::spanText()
     return ss.str();
 }
 
-void cPathFinder::negCost(int cost)
+void cPathFinder::makeCostsPositive(int cost)
 {
     graph_traits<graph_t>::edge_iterator ei, ei_end;
     for (tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
@@ -329,6 +364,20 @@ void cPathFinder::negCost(int cost)
         myGraph[*ei].myCost -= cost;
     }
     myMaxNegCost = cost;
+}
+
+void cPathFinder::makeComplete()
+{
+    for (int u = 0; u < linkCount(); u++)
+    {
+        for (int v = u + 1; v < linkCount(); v++)
+        {
+            if (!edge(u, v, myGraph).second)
+                addLink(
+                    u, v,
+                    INT_MAX);
+        }
+    }
 }
 
 std::string cPathFinder::pathViz()
@@ -531,7 +580,7 @@ void cPathFinder::hills(
 
     // cost links according to change in height they incur
     int rowCount = gheight.size();
-    if( ! rowCount )
+    if (!rowCount)
         throw std::runtime_error(
             "cPathFinder::hills bad grid");
     int colCount = gheight[0].size();
@@ -554,4 +603,59 @@ void cPathFinder::hills(
     path();
 
     std::cout << "hills " << pathText() << "\n";
+}
+
+void cPathFinder::gsingh()
+{
+    //loop over source nodes
+    for (int src = 0; src < nodeCount(); src++)
+    {
+        // Run Dijsktra
+        myStart = src;
+        paths(src);
+
+        // loop over destination nodes
+        for (int dst = 0; dst < nodeCount(); dst++)
+        {
+            if (src == dst)
+                continue;
+
+            // display paths that visit 5 nodes
+            if (pathPick(dst).size() == 5)
+                std::cout << pathText();
+        }
+    }
+}
+void cPathFinder::shaun()
+{
+    int MaxNegCost = 0;
+    graph_traits<graph_t>::edge_iterator ei, ei_end;
+    for (boost::tie(ei, ei_end) = edges(myGraph); ei != ei_end; ++ei)
+    {
+        int source = boost::source(*ei, myGraph);
+        int target = boost::target(*ei, myGraph);
+        int cost = atoi(myGraph[target].myColor.c_str()) - atoi(myGraph[source].myColor.c_str());
+        myDirGraph[add_edge(source, target, myDirGraph).first].myCost = cost;
+        myDirGraph[add_edge(target, source, myDirGraph).first].myCost = -cost;
+        if (cost < MaxNegCost)
+            MaxNegCost = cost;
+        if (-cost < MaxNegCost)
+            MaxNegCost = -cost;
+    }
+    graph_traits<dir_graph_t>::edge_iterator dei, dei_end;
+    for (boost::tie(dei, dei_end) = edges(myDirGraph); dei != dei_end; ++dei)
+    {
+        std::cout << boost::source(*dei, myDirGraph) << " -> "
+                  << boost::target(*dei, myDirGraph) << " cost "
+                  << myDirGraph[*dei].myCost << " converts to ";
+
+        myDirGraph[*dei].myCost -= MaxNegCost;
+        myDirGraph[*dei].myCost += 2 * MaxNegCost;
+        myDirGraph[*dei].myCost *= -1;
+
+        std::cout
+            << myDirGraph[*dei].myCost << "\n\n";
+    }
+    myfDirected = true;
+    //tsp();
 }

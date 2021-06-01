@@ -1,3 +1,4 @@
+format sales
 c 0 0 a
 c 10 0 b
 c 10 10 c
