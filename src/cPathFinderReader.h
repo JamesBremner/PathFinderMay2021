@@ -78,6 +78,11 @@ private:
     std::vector<std::string> ParseSpaceDelimited(
         const std::string &l);
 
-        std::string orthogonalGridNodeName(
-            int row, int col );
+    /** Create a name for a grid node
+     * @param[in] 0-based row position
+     * @param[in] 0-based col position
+     * @return 1 based node name, format "r<row+1>c<col+1>"
+     */
+    std::string orthogonalGridNodeName(
+        int row, int col);
 };

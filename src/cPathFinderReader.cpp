@@ -455,7 +455,6 @@ void cPathFinderReader::islands()
             }
         }
     }
-    std::cout << myFinder.linksText();
 }
 
 void cPathFinderReader::multi()
